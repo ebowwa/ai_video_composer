@@ -192,6 +192,10 @@ with gr.Blocks(css=css) as demo:
                     "make a video gif given each image 1s loop"
                  ],
                 [
+                    ["./examples/example.mp4"],
+                    "please encode this video 10 times faster"
+                ],
+                [
                     ["./examples/heat-wave.mp3", "./examples/square-image.png"],
                     "Make a 720x720 video with a white waveform of the audio taking all screen space, also add the image as the background",
                 ],
