@@ -11,6 +11,7 @@ import uuid
 import tempfile
 import shlex
 import shutil
+from utils import format_bash_command
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 openai.api_key = OPENAI_API_KEY
@@ -52,7 +53,7 @@ def get_files_infos(files):
     return results
 
 
-def get_completion(prompt, files_info):
+def get_completion(prompt, files_info, top_p, temperature):
 
     files_info_string = "".join(str(x) for x in files_info)
     messages = [
@@ -81,8 +82,10 @@ YOUR FFMPEG COMMAND:""",
     print(messages)
 
     try:
-        completion = openai.ChatCompletion.create(
-            model="gpt-4", messages=messages)
+        completion = openai.ChatCompletion.create(model="gpt-4",
+                                                  messages=messages,
+                                                  top_p=top_p,
+                                                  temperature=temperature)
 
         command = completion.choices[0].message.content.replace("\n", "")
 
@@ -95,14 +98,14 @@ YOUR FFMPEG COMMAND:""",
         raise Exception("OpenAI API error")
 
 
-def update(files, prompt):
+def update(files, prompt, top_p=1, temperature=1):
     if prompt == "":
         raise gr.Error("Please enter a prompt.")
 
     files_info = get_files_infos(files)
 
     try:
-        command_string = get_completion(prompt, files_info)
+        command_string = get_completion(prompt, files_info, top_p, temperature)
         print(
             f"""\n\n/// START OF COMMAND ///:\n{command_string}\n/// END OF COMMAND ///\n\n""")
 
@@ -130,8 +133,8 @@ def update(files, prompt):
         output_file_name = f'output_{uuid.uuid4()}.mp4'
         output_file_path = str((Path(temp_dir) / output_file_name).resolve())
         subprocess.run(args + ["-y", output_file_path], cwd=temp_dir)
-
-        return output_file_path
+        generated_command = f"### Generated Command\n```bash\n{format_bash_command(args)}\n    -y output.mp4\n```"
+        return output_file_path, gr.update(value=generated_command)
     except Exception as e:
         print("FROM UPDATE", e)
         raise gr.Error(e)
@@ -153,7 +156,7 @@ css = """
 with gr.Blocks(css=css) as demo:
     gr.Markdown(
         """
-            # <span style="margin-right: 0.3rem;">🏞</span> Video Composer
+            # <span style="margin-right: 0.3rem;">🏞</span>GPT-4 Video Composer
             Add video, image and audio assets and ask ChatGPT to compose a new video.
         """,
         elem_id="header",
@@ -168,45 +171,54 @@ with gr.Blocks(css=css) as demo:
                 label="Instructions",
             )
             btn = gr.Button("Run", label="Run")
+            with gr.Accordion("Parameters", open=False):
+                top_p = gr.Slider(minimum=-0, maximum=1.0, value=1.0, step=0.05,
+                                  interactive=True, label="Top-p (nucleus sampling)")
+                temperature = gr.Slider(
+                    minimum=-0, maximum=5.0, value=1.0, step=0.1, interactive=True, label="Temperature")
         with gr.Column():
             generated_video = gr.Video(
                 interactive=False, label="Generated Video", include_audio=True
             )
+            generated_command = gr.Markdown()
 
         btn.click(
-            fn=update, inputs=[user_files,
-                               user_prompt], outputs=[generated_video]
+            fn=update, inputs=[user_files, user_prompt, top_p, temperature],
+            outputs=[generated_video, generated_command]
         )
     with gr.Row():
         gr.Examples(
             examples=[
-                [[
-                    "./examples/cat8.jpeg",
-                    "./examples/cat1.jpeg",
-                    "./examples/cat2.jpeg",
-                    "./examples/cat3.jpeg",
-                    "./examples/cat4.jpeg",
-                    "./examples/cat5.jpeg",
-                    "./examples/cat6.jpeg",
-                    "./examples/cat7.jpeg"],
-                    "make a video gif given each image 1s loop"
+                [["./examples/cat8.jpeg",
+                  "./examples/cat1.jpeg",
+                  "./examples/cat2.jpeg",
+                  "./examples/cat3.jpeg",
+                  "./examples/cat4.jpeg",
+                  "./examples/cat5.jpeg",
+                  "./examples/cat6.jpeg",
+                  "./examples/cat7.jpeg"],
+                    "make a video gif given each image 1s loop",
+                    0, 0
                  ],
                 [
                     ["./examples/example.mp4"],
-                    "please encode this video 10 times faster"
+                    "please encode this video 10 times faster",
+                    0, 0
                 ],
                 [
                     ["./examples/heat-wave.mp3", "./examples/square-image.png"],
                     "Make a 720x720 video with a white waveform of the audio taking all screen space, also add the image as the background",
+                    0, 0
                 ],
                 [
                     ["./examples/waterfall-overlay.png",
                         "./examples/waterfall.mp4"],
                     "Add the overlay to the video.",
+                    0, 0
                 ],
             ],
-            inputs=[user_files, user_prompt],
-            outputs=generated_video,
+            inputs=[user_files, user_prompt, top_p, temperature],
+            outputs=[generated_video, generated_command],
             fn=update,
             cache_examples=True,
         )

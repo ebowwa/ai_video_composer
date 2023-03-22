@@ -1,5 +1,5 @@
 ---
-title: ChatGPT-4 Video Composer
+title: GPT-4 Video Composer
 emoji: 🐠
 colorFrom: red
 colorTo: yellow
