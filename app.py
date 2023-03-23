@@ -103,7 +103,18 @@ def update(files, prompt, top_p=1, temperature=1):
         raise gr.Error("Please enter a prompt.")
 
     files_info = get_files_infos(files)
-
+    # disable this if you're running the app locally or on your own server
+    for file_info in files_info:
+        if file_info["type"] == "video":
+            duration = int(file_info["duration"].split("s")[0])
+            if duration > 60:
+                raise gr.Error(
+                    "Please make sure all videos are less than 1 minute long."
+                )
+        if file_info["size"] > 10000000:
+            raise gr.Error(
+                "Please make sure all files are less than 10MB in size."
+            )
     try:
         command_string = get_completion(prompt, files_info, top_p, temperature)
         print(
