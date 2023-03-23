@@ -1,6 +1,6 @@
 ---
 title: Video Composer GPT-4
-emoji: 🐠
+emoji: 🏞
 colorFrom: red
 colorTo: yellow
 sdk: gradio
