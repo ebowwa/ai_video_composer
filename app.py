@@ -261,7 +261,7 @@ with gr.Blocks(css=css) as demo:
             """
             If you have idea to improve this please open a PR:
 
-            [![Open a Pull Request](https://huggingface.co/datasets/huggingface/badges/raw/main/open-a-pr-lg-light.svg)](https://huggingface.co/spaces/victor/ChatUI/discussions)
+            [![Open a Pull Request](https://huggingface.co/datasets/huggingface/badges/raw/main/open-a-pr-lg-light.svg)](https://huggingface.co/spaces/huggingface-projects/video-composer-gpt4/discussions)
             """,
         )
 
