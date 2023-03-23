@@ -64,11 +64,13 @@ def get_completion(prompt, files_info, top_p, temperature):
 
     files_info_string = ""
     for file_info in files_info:
-        files_info_string += f"""{file_info["type"]} name {file_info["name"]}"""
+        files_info_string += f"""{file_info["type"]} {file_info["name"]}"""
         if file_info["type"] == "video" or file_info["type"] == "image":
             files_info_string += f""" {file_info["dimensions"]}"""
-        if file_info["type"] == "video" or file_info["type"] == "audio" or file_info["type"] == "video/audio":
-            files_info_string += f""" {file_info["duration"]}s with {file_info["audio_channels"]} audio channels"""
+        if file_info["type"] == "video" or file_info["type"] == "audio":
+            files_info_string += f""" {file_info["duration"]}s"""
+        if file_info["type"] == "audio" or file_info["type"] == "video/audio":
+            files_info_string += f""" {file_info["audio_channels"]} audio channels"""
         files_info_string += "\n"
 
     messages = [
@@ -227,7 +229,7 @@ with gr.Blocks(css=css) as demo:
                   "./examples/cat6.jpeg",
                   "./examples/cat7.jpeg",
                   "./examples/heat-wave.mp3"],
-                    "make a video gif each image 1s loop and audio as background",
+                    "make a video gif, each image with 1s loop and add the audio as background",
                     0, 0
                  ],
                 [
@@ -250,7 +252,7 @@ with gr.Blocks(css=css) as demo:
             inputs=[user_files, user_prompt, top_p, temperature],
             outputs=[generated_video, generated_command],
             fn=update,
-            cache_examples=False,
+            cache_examples=True,
         )
 
     with gr.Row():

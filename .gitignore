@@ -4,4 +4,3 @@ venv/
 __pycache__/
 .DS_Store
 flagged
-gradio_cached_examples/
