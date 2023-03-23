@@ -16,6 +16,9 @@ from utils import format_bash_command
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 openai.api_key = OPENAI_API_KEY
 
+allowed_medias = [".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".gif", ".svg", ".mp3", ".wav", ".ogg", ".mp4",
+                  ".avi", ".mov", ".mkv", ".flv", ".wmv", ".webm", ".mpg", ".mpeg", ".m4v", ".3gp", ".3g2", ".3gpp"]
+
 
 def get_files_infos(files):
     results = []
@@ -29,13 +32,17 @@ def get_files_infos(files):
         if file_extension in (".mp4", ".avi", ".mkv", ".mov"):
             info["type"] = "video"
             video = VideoFileClip(file.name)
-            info["duration"] = str(video.duration) + "s"
+            info["duration"] = video.duration
             info["dimensions"] = "{}x{}".format(video.size[0], video.size[1])
+            if video.audio:
+                info["type"] = "video/audio"
+                info["audio_channels"] = video.audio.nchannels
             video.close()
         elif file_extension in (".mp3", ".wav"):
             info["type"] = "audio"
             audio = AudioFileClip(file.name)
-            info["duration"] = str(audio.duration) + "s"
+            info["duration"] = audio.duration
+            info["audio_channels"] = audio.nchannels
             audio.close()
         elif file_extension in (
             ".png",
@@ -55,7 +62,15 @@ def get_files_infos(files):
 
 def get_completion(prompt, files_info, top_p, temperature):
 
-    files_info_string = "".join(str(x) for x in files_info)
+    files_info_string = ""
+    for file_info in files_info:
+        files_info_string += f"""{file_info["type"]} name {file_info["name"]}"""
+        if file_info["type"] == "video" or file_info["type"] == "image":
+            files_info_string += f""" {file_info["dimensions"]}"""
+        if file_info["type"] == "video" or file_info["type"] == "audio" or file_info["type"] == "video/audio":
+            files_info_string += f""" {file_info["duration"]}s with {file_info["audio_channels"]} audio channels"""
+        files_info_string += "\n"
+
     messages = [
         {
             "role": "system",
@@ -73,13 +88,16 @@ Always output the media a video/mp4 and output file "output.mp4". Provide only t
 
 The current assets and objective follow. Reply with the FFMPEG command:
 
-AVAILABLE ASSETS LIST: {files_info_string}
+AVAILABLE ASSETS LIST:
+
+{files_info_string}
+
 OBJECTIVE: {prompt}
 YOUR FFMPEG COMMAND:""",
         }
     ]
 
-    print(messages)
+    print(messages[0]["content"])
 
     try:
         completion = openai.ChatCompletion.create(model="gpt-4",
@@ -106,10 +124,9 @@ def update(files, prompt, top_p=1, temperature=1):
     # disable this if you're running the app locally or on your own server
     for file_info in files_info:
         if file_info["type"] == "video":
-            duration = int(file_info["duration"].split("s")[0])
-            if duration > 60:
+            if file_info["duration"] > 120:
                 raise gr.Error(
-                    "Please make sure all videos are less than 1 minute long."
+                    "Please make sure all videos are less than 2 minute long."
                 )
         if file_info["size"] > 10000000:
             raise gr.Error(
@@ -118,7 +135,7 @@ def update(files, prompt, top_p=1, temperature=1):
     try:
         command_string = get_completion(prompt, files_info, top_p, temperature)
         print(
-            f"""\n\n/// START OF COMMAND ///:\n{command_string}\n/// END OF COMMAND ///\n\n""")
+            f"""\n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n""")
 
         # split command string into list of arguments
         args = shlex.split(command_string)
@@ -175,7 +192,8 @@ with gr.Blocks(css=css) as demo:
     with gr.Row():
         with gr.Column():
             user_files = gr.File(
-                file_count="multiple", label="Media files", keep_filename=True
+                file_count="multiple", label="Media files", keep_filename=True,
+                file_types=allowed_medias
             )
             user_prompt = gr.Textbox(
                 placeholder="I want to convert to a gif under 15mb",
@@ -207,8 +225,9 @@ with gr.Blocks(css=css) as demo:
                   "./examples/cat4.jpeg",
                   "./examples/cat5.jpeg",
                   "./examples/cat6.jpeg",
-                  "./examples/cat7.jpeg"],
-                    "make a video gif given each image 1s loop",
+                  "./examples/cat7.jpeg",
+                  "./examples/heat-wave.mp3"],
+                    "make a video gif each image 1s loop and audio as background",
                     0, 0
                  ],
                 [
@@ -231,7 +250,7 @@ with gr.Blocks(css=css) as demo:
             inputs=[user_files, user_prompt, top_p, temperature],
             outputs=[generated_video, generated_command],
             fn=update,
-            cache_examples=True,
+            cache_examples=False,
         )
 
     with gr.Row():
