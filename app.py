@@ -167,8 +167,7 @@ def update(files, prompt, top_p=1, temperature=1):
         return output_file_path, gr.update(value=generated_command)
     except Exception as e:
         print("FROM UPDATE", e)
-        raise gr.Error(str(e))
-
+        raise gr.Error(e)
 
 
 css = """
