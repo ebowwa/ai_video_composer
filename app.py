@@ -293,6 +293,7 @@ with gr.Blocks(css=css) as demo:
             inputs=[user_files, user_prompt, top_p, temperature],
             outputs=[generated_video, generated_command],
             fn=update,
+            run_on_click=True,
             cache_examples=True,
         )
 
