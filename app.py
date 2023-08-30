@@ -16,8 +16,31 @@ from utils import format_bash_command
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 openai.api_key = OPENAI_API_KEY
 
-allowed_medias = [".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".gif", ".svg", ".mp3", ".wav", ".ogg", ".mp4",
-                  ".avi", ".mov", ".mkv", ".flv", ".wmv", ".webm", ".mpg", ".mpeg", ".m4v", ".3gp", ".3g2", ".3gpp"]
+allowed_medias = [
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".tiff",
+    ".bmp",
+    ".gif",
+    ".svg",
+    ".mp3",
+    ".wav",
+    ".ogg",
+    ".mp4",
+    ".avi",
+    ".mov",
+    ".mkv",
+    ".flv",
+    ".wmv",
+    ".webm",
+    ".mpg",
+    ".mpeg",
+    ".m4v",
+    ".3gp",
+    ".3g2",
+    ".3gpp",
+]
 
 
 def get_files_infos(files):
@@ -61,7 +84,6 @@ def get_files_infos(files):
 
 
 def get_completion(prompt, files_info, top_p, temperature):
-
     files_info_string = ""
     for file_info in files_info:
         files_info_string += f"""{file_info["type"]} {file_info["name"]}"""
@@ -102,10 +124,9 @@ YOUR FFMPEG COMMAND:""",
     print(messages[0]["content"])
 
     try:
-        completion = openai.ChatCompletion.create(model="gpt-4",
-                                                  messages=messages,
-                                                  top_p=top_p,
-                                                  temperature=temperature)
+        completion = openai.ChatCompletion.create(
+            model="gpt-4", messages=messages, top_p=top_p, temperature=temperature
+        )
 
         command = completion.choices[0].message.content.replace("\n", "")
 
@@ -131,17 +152,16 @@ def update(files, prompt, top_p=1, temperature=1):
                     "Please make sure all videos are less than 2 minute long."
                 )
         if file_info["size"] > 10000000:
-            raise gr.Error(
-                "Please make sure all files are less than 10MB in size."
-            )
+            raise gr.Error("Please make sure all files are less than 10MB in size.")
     try:
         command_string = get_completion(prompt, files_info, top_p, temperature)
         print(
-            f"""\n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n""")
+            f"""\n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
+        )
 
         # split command string into list of arguments
         args = shlex.split(command_string)
-        if (args[0] != "ffmpeg"):
+        if args[0] != "ffmpeg":
             raise Exception("Command does not start with ffmpeg")
         temp_dir = tempfile.mkdtemp()
         # copy files to temp dir
@@ -151,16 +171,16 @@ def update(files, prompt, top_p=1, temperature=1):
 
         # test if ffmpeg command is valid dry run
         ffmpg_dry_run = subprocess.run(
-            args + ["-f", "null", "-"], stderr=subprocess.PIPE, text=True, cwd=temp_dir)
+            args + ["-f", "null", "-"], stderr=subprocess.PIPE, text=True, cwd=temp_dir
+        )
         if ffmpg_dry_run.returncode == 0:
             print("Command is valid.")
         else:
             print("Command is not valid. Error output:")
             print(ffmpg_dry_run.stderr)
-            raise Exception(
-                "FFMPEG generated command is not valid. Please try again.")
+            raise Exception("FFMPEG generated command is not valid. Please try again.")
 
-        output_file_name = f'output_{uuid.uuid4()}.mp4'
+        output_file_name = f"output_{uuid.uuid4()}.mp4"
         output_file_path = str((Path(temp_dir) / output_file_name).resolve())
         subprocess.run(args + ["-y", output_file_path], cwd=temp_dir)
         generated_command = f"### Generated Command\n```bash\n{format_bash_command(args)}\n    -y output.mp4\n```"
@@ -194,8 +214,10 @@ with gr.Blocks(css=css) as demo:
     with gr.Row():
         with gr.Column():
             user_files = gr.File(
-                file_count="multiple", label="Media files", keep_filename=True,
-                file_types=allowed_medias
+                file_count="multiple",
+                label="Media files",
+                keep_filename=True,
+                file_types=allowed_medias,
             )
             user_prompt = gr.Textbox(
                 placeholder="I want to convert to a gif under 15mb",
@@ -203,10 +225,22 @@ with gr.Blocks(css=css) as demo:
             )
             btn = gr.Button("Run", label="Run")
             with gr.Accordion("Parameters", open=False):
-                top_p = gr.Slider(minimum=-0, maximum=1.0, value=1.0, step=0.05,
-                                  interactive=True, label="Top-p (nucleus sampling)")
+                top_p = gr.Slider(
+                    minimum=-0,
+                    maximum=1.0,
+                    value=1.0,
+                    step=0.05,
+                    interactive=True,
+                    label="Top-p (nucleus sampling)",
+                )
                 temperature = gr.Slider(
-                    minimum=-0, maximum=5.0, value=1.0, step=0.1, interactive=True, label="Temperature")
+                    minimum=-0,
+                    maximum=5.0,
+                    value=1.0,
+                    step=0.1,
+                    interactive=True,
+                    label="Temperature",
+                )
         with gr.Column():
             generated_video = gr.Video(
                 interactive=False, label="Generated Video", include_audio=True
@@ -214,39 +248,46 @@ with gr.Blocks(css=css) as demo:
             generated_command = gr.Markdown()
 
         btn.click(
-            fn=update, inputs=[user_files, user_prompt, top_p, temperature],
-            outputs=[generated_video, generated_command]
+            fn=update,
+            inputs=[user_files, user_prompt, top_p, temperature],
+            outputs=[generated_video, generated_command],
         )
     with gr.Row():
         gr.Examples(
             examples=[
-                [["./examples/cat8.jpeg",
-                  "./examples/cat1.jpeg",
-                  "./examples/cat2.jpeg",
-                  "./examples/cat3.jpeg",
-                  "./examples/cat4.jpeg",
-                  "./examples/cat5.jpeg",
-                  "./examples/cat6.jpeg",
-                  "./examples/cat7.jpeg",
-                  "./examples/heat-wave.mp3"],
+                [
+                    [
+                        "./examples/cat8.jpeg",
+                        "./examples/cat1.jpeg",
+                        "./examples/cat2.jpeg",
+                        "./examples/cat3.jpeg",
+                        "./examples/cat4.jpeg",
+                        "./examples/cat5.jpeg",
+                        "./examples/cat6.jpeg",
+                        "./examples/cat7.jpeg",
+                        "./examples/heat-wave.mp3",
+                    ],
                     "make a video gif, each image with 1s loop and add the audio as background",
-                    0, 0
-                 ],
+                    0,
+                    0,
+                ],
                 [
                     ["./examples/example.mp4"],
                     "please encode this video 10 times faster",
-                    0, 0
+                    0,
+                    0,
                 ],
                 [
                     ["./examples/heat-wave.mp3", "./examples/square-image.png"],
                     "Make a 720x720 video with a white waveform of the audio taking all screen space, also add the image as the background",
-                    0, 0
+                    0,
+                    0,
                 ],
                 [
-                    ["./examples/waterfall-overlay.png",
-                        "./examples/waterfall.mp4"],
+                    ["./examples/waterfall-overlay.png", "./examples/waterfall.mp4"],
                     "Add the overlay to the video.",
-                    0, 0
+                    0,
+                    0,
                 ],
             ],
             inputs=[user_files, user_prompt, top_p, temperature],
@@ -256,7 +297,6 @@ with gr.Blocks(css=css) as demo:
         )
 
     with gr.Row():
-
         gr.Markdown(
             """
             If you have idea to improve this please open a PR:
@@ -264,5 +304,5 @@ with gr.Blocks(css=css) as demo:
             [![Open a Pull Request](https://huggingface.co/datasets/huggingface/badges/raw/main/open-a-pr-lg-light.svg)](https://huggingface.co/spaces/huggingface-projects/video-composer-gpt4/discussions)
             """,
         )
-
-demo.launch()
+demo.queue(api_open=False)
+demo.launch(show_api=False)
