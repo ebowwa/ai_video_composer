@@ -100,7 +100,7 @@ def get_completion(prompt, files_info, top_p, temperature):
             "role": "system",
             # "content": f"""Act as a FFMPEG expert. Create a valid FFMPEG command that will be directly pasted in the terminal. Using those files: {files_info} create the FFMPEG command to achieve this: "{prompt}". Make sure it's a valid command that will not do any error. Always name the output of the FFMPEG command "output.mp4". Always use the FFMPEG overwrite option (-y). Don't produce video longer than 1 minute. Think step by step but never give any explanation, only the shell command.""",
             # "content": f"""You'll need to create a valid FFMPEG command that will be directly pasted in the terminal. You have those files (images, videos, and audio) at your disposal: {files_info} and you need to compose a new video using FFMPEG and following those instructions: "{prompt}". You'll need to use as many assets as you can. Make sure it's a valid command that will not do any error. Always name the output of the FFMPEG command "output.mp4". Always use the FFMPEG overwrite option (-y). Try to avoid using -filter_complex option.  Don't produce video longer than 1 minute. Think step by step but never give any explanation, only the shell command.""",
-            "content": f"""
+            "content": """
 You are a very experienced agent controlling a UNIX terminal and a contributor to the ffmpeg project. You are given:
 (1) a set of video, audio and/or image assets. Including their name, duration, dimensions and file size
 (2) the description of a new video you need to create from the list of assets
@@ -109,7 +109,11 @@ Based on the available assets and the description, your objective issue a FFMPEG
 
 This will often involve putting assets one after the other, cropping the video format, or playing music in the background. Avoid using complex FFMPEG options, and try to keep the command as simple as possible as it will be directly paster into the terminal.
 Always output the media a video/mp4 and output file "output.mp4". Provide only the shell command without any explanations.
-
+""",
+        },
+        {
+            "role": "user",
+            "content": f"""
 The current assets and objective follow. Reply with the FFMPEG command:
 
 AVAILABLE ASSETS LIST:
@@ -117,17 +121,14 @@ AVAILABLE ASSETS LIST:
 {files_info_string}
 
 OBJECTIVE: {prompt}
-YOUR FFMPEG COMMAND:""",
-        }
+YOUR FFMPEG COMMAND:
+         """,
+        },
     ]
-
-    print(messages[0]["content"])
-
     try:
         completion = openai.ChatCompletion.create(
             model="gpt-4", messages=messages, top_p=top_p, temperature=temperature
         )
-
         command = completion.choices[0].message.content.replace("\n", "")
 
         # remove output.mp4 with the actual output file path
@@ -156,7 +157,7 @@ def update(files, prompt, top_p=1, temperature=1):
     try:
         command_string = get_completion(prompt, files_info, top_p, temperature)
         print(
-            f"""\n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
+            f"""///PROMTP {prompt} \n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
         )
 
         # split command string into list of arguments
