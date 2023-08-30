@@ -100,7 +100,9 @@ def get_completion(prompt, files_info, top_p, temperature):
             "role": "system",
             # "content": f"""Act as a FFMPEG expert. Create a valid FFMPEG command that will be directly pasted in the terminal. Using those files: {files_info} create the FFMPEG command to achieve this: "{prompt}". Make sure it's a valid command that will not do any error. Always name the output of the FFMPEG command "output.mp4". Always use the FFMPEG overwrite option (-y). Don't produce video longer than 1 minute. Think step by step but never give any explanation, only the shell command.""",
             # "content": f"""You'll need to create a valid FFMPEG command that will be directly pasted in the terminal. You have those files (images, videos, and audio) at your disposal: {files_info} and you need to compose a new video using FFMPEG and following those instructions: "{prompt}". You'll need to use as many assets as you can. Make sure it's a valid command that will not do any error. Always name the output of the FFMPEG command "output.mp4". Always use the FFMPEG overwrite option (-y). Try to avoid using -filter_complex option.  Don't produce video longer than 1 minute. Think step by step but never give any explanation, only the shell command.""",
-            "content": """You are a very experienced media engineer,controlling a UNIX terminal. You are an FFMPEG expert with years of experience and multiple contributions to the FFMPEG project.
+            "content": """
+You are a very experienced media engineer, controlling a UNIX terminal.
+You are an FFMPEG expert with years of experience and multiple contributions to the FFMPEG project.
 
 You are given:
 (1) a set of video, audio and/or image assets. Including their name, duration, dimensions and file size
@@ -153,61 +155,60 @@ def update(files, prompt, top_p=1, temperature=1):
                 )
         if file_info["size"] > 10000000:
             raise gr.Error("Please make sure all files are less than 10MB in size.")
-    try:
-        command_string = get_completion(prompt, files_info, top_p, temperature)
-        print(
-            f"""///PROMTP {prompt} \n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
-        )
 
-        # split command string into list of arguments
-        args = shlex.split(command_string)
-        if args[0] != "ffmpeg":
-            raise Exception("Command does not start with ffmpeg")
-        temp_dir = tempfile.mkdtemp()
-        # copy files to temp dir
-        for file in files:
-            file_path = Path(file.name)
-            shutil.copy(file_path, temp_dir)
+    attempts = 0
+    while attempts < 2:
+        print("ATTEMPT", attempts)
+        try:
+            command_string = get_completion(prompt, files_info, top_p, temperature)
+            print(
+                f"""///PROMTP {prompt} \n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
+            )
 
-        # test if ffmpeg command is valid dry run
-        ffmpg_dry_run = subprocess.run(
-            args + ["-f", "null", "-"], stderr=subprocess.PIPE, text=True, cwd=temp_dir
-        )
-        if ffmpg_dry_run.returncode == 0:
-            print("Command is valid.")
-        else:
-            print("Command is not valid. Error output:")
-            print(ffmpg_dry_run.stderr)
-            raise Exception("FFMPEG generated command is not valid. Please try again.")
+            # split command string into list of arguments
+            args = shlex.split(command_string)
+            if args[0] != "ffmpeg":
+                raise Exception("Command does not start with ffmpeg")
+            temp_dir = tempfile.mkdtemp()
+            # copy files to temp dir
+            for file in files:
+                file_path = Path(file.name)
+                shutil.copy(file_path, temp_dir)
 
-        output_file_name = f"output_{uuid.uuid4()}.mp4"
-        output_file_path = str((Path(temp_dir) / output_file_name).resolve())
-        subprocess.run(args + ["-y", output_file_path], cwd=temp_dir)
-        generated_command = f"### Generated Command\n```bash\n{format_bash_command(args)}\n    -y output.mp4\n```"
-        return output_file_path, gr.update(value=generated_command)
-    except Exception as e:
-        print("FROM UPDATE", e)
-        raise gr.Error(e)
+            # test if ffmpeg command is valid dry run
+            ffmpg_dry_run = subprocess.run(
+                args + ["-f", "null", "-"],
+                stderr=subprocess.PIPE,
+                text=True,
+                cwd=temp_dir,
+            )
+            if ffmpg_dry_run.returncode == 0:
+                print("Command is valid.")
+            else:
+                print("Command is not valid. Error output:")
+                print(ffmpg_dry_run.stderr)
+                raise Exception(
+                    "FFMPEG generated command is not valid. Please try again."
+                )
+
+            output_file_name = f"output_{uuid.uuid4()}.mp4"
+            output_file_path = str((Path(temp_dir) / output_file_name).resolve())
+            subprocess.run(args + ["-y", output_file_path], cwd=temp_dir)
+            generated_command = f"### Generated Command\n```bash\n{format_bash_command(args)}\n    -y output.mp4\n```"
+            return output_file_path, gr.update(value=generated_command)
+        except Exception as e:
+            attempts += 1
+            if attempts >= 2:
+                print("FROM UPDATE", e)
+                raise gr.Error(e)
 
 
-css = """
-# #header {
-#     padding: 1.5rem 0 0.8rem;
-# }
-# #header h1 {
-#     font-size: 1.5rem; margin-bottom: 0.3rem;
-# }
-# .boundedheight, .unpadded_box {
-#     height: 30vh !important;
-#     max-height: 50vh !important;
-# }
-"""
-
-with gr.Blocks(css=css) as demo:
+with gr.Blocks() as demo:
     gr.Markdown(
         """
-            # <span style="margin-right: 0.3rem;">🏞</span>GPT-4 Video Composer
+            # 🏞 GPT-4 Video Composer
             Add video, image and audio assets and ask ChatGPT to compose a new video.
+            **Please note: This demo is not a generative AI model, it only uses GPT-4 to generate a valid FFMPEG command based on the input files and the prompt.**
         """,
         elem_id="header",
     )
@@ -279,7 +280,7 @@ with gr.Blocks(css=css) as demo:
                 ],
                 [
                     ["./examples/heat-wave.mp3", "./examples/square-image.png"],
-                    "Make a 720x720 video, a white waveform of the audio taking all screen space, and finally add add the input image as the background all along the video.",
+                    "Make a 720x720 video, a white waveform of the audio, and finally add add the input image as the background all along the video.",
                     0,
                     0,
                 ],
