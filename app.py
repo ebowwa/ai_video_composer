@@ -100,27 +100,26 @@ def get_completion(prompt, files_info, top_p, temperature):
             "role": "system",
             # "content": f"""Act as a FFMPEG expert. Create a valid FFMPEG command that will be directly pasted in the terminal. Using those files: {files_info} create the FFMPEG command to achieve this: "{prompt}". Make sure it's a valid command that will not do any error. Always name the output of the FFMPEG command "output.mp4". Always use the FFMPEG overwrite option (-y). Don't produce video longer than 1 minute. Think step by step but never give any explanation, only the shell command.""",
             # "content": f"""You'll need to create a valid FFMPEG command that will be directly pasted in the terminal. You have those files (images, videos, and audio) at your disposal: {files_info} and you need to compose a new video using FFMPEG and following those instructions: "{prompt}". You'll need to use as many assets as you can. Make sure it's a valid command that will not do any error. Always name the output of the FFMPEG command "output.mp4". Always use the FFMPEG overwrite option (-y). Try to avoid using -filter_complex option.  Don't produce video longer than 1 minute. Think step by step but never give any explanation, only the shell command.""",
-            "content": """
-You are a very experienced agent controlling a UNIX terminal and a contributor to the ffmpeg project. You are given:
+            "content": """You are a very experienced media engineer,controlling a UNIX terminal. You are an FFMPEG expert with years of experience and multiple contributions to the FFMPEG project.
+
+You are given:
 (1) a set of video, audio and/or image assets. Including their name, duration, dimensions and file size
 (2) the description of a new video you need to create from the list of assets
 
 Based on the available assets and the description, your objective issue a FFMPEG to create a new video using the assets.
-
 This will often involve putting assets one after the other, cropping the video format, or playing music in the background. Avoid using complex FFMPEG options, and try to keep the command as simple as possible as it will be directly paster into the terminal.
-Always output the media a video/mp4 and output file "output.mp4". Provide only the shell command without any explanations.
 """,
         },
         {
             "role": "user",
-            "content": f"""
+            "content": f"""Always output the media as video/mp4 and output file with "output.mp4". Provide only the shell command without any explanations.
 The current assets and objective follow. Reply with the FFMPEG command:
 
 AVAILABLE ASSETS LIST:
 
 {files_info_string}
 
-OBJECTIVE: {prompt}
+OBJECTIVE: {prompt} and output at "output.mp4"
 YOUR FFMPEG COMMAND:
          """,
         },
@@ -280,7 +279,7 @@ with gr.Blocks(css=css) as demo:
                 ],
                 [
                     ["./examples/heat-wave.mp3", "./examples/square-image.png"],
-                    "Make a 720x720 video with a white waveform of the audio taking all screen space, also add the image as the background",
+                    "Make a 720x720 video, a white waveform of the audio taking all screen space, and finally add add the input image as the background all along the video.",
                     0,
                     0,
                 ],
