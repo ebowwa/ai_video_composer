@@ -217,7 +217,6 @@ with gr.Blocks() as demo:
             user_files = gr.File(
                 file_count="multiple",
                 label="Media files",
-                keep_filename=True,
                 file_types=allowed_medias,
             )
             user_prompt = gr.Textbox(
