@@ -4,7 +4,7 @@ from PIL import Image
 from moviepy.editor import VideoFileClip, AudioFileClip
 
 import os
-import openai
+from openai import OpenAI
 import subprocess
 from pathlib import Path
 import uuid
@@ -13,8 +13,11 @@ import shlex
 import shutil
 from utils import format_bash_command
 
-OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
-openai.api_key = OPENAI_API_KEY
+HF_API_KEY = os.environ["HF_API_KEY"]
+client = OpenAI(
+    base_url="https://api-inference.huggingface.co/v1/",
+    api_key=HF_API_KEY
+)
 
 allowed_medias = [
     ".png",
@@ -127,8 +130,12 @@ YOUR FFMPEG COMMAND:
         },
     ]
     try:
-        completion = openai.ChatCompletion.create(
-            model="gpt-4", messages=messages, top_p=top_p, temperature=temperature
+        completion = client.chat.completions.create(
+            model="Qwen/Qwen2.5-Coder-32B-Instruct",
+            messages=messages,
+            temperature=temperature,
+            top_p=top_p,
+            max_tokens=2048
         )
         command = completion.choices[0].message.content.replace("\n", "")
 
