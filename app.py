@@ -120,6 +120,7 @@ Key requirements:
 - Output exactly ONE command that will be directly pasted into the terminal
 - Never output multiple commands chained together
 - Do not specify yuv420p pixel format - let ffmpeg choose the optimal format
+- Output the command in a single line (no line breaks or multiple lines)
 
 Remember: Simpler is better. Only use advanced ffmpeg features if absolutely necessary for the requested output.
 """,
