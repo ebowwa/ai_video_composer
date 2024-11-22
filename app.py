@@ -112,8 +112,10 @@ You are given:
 (1) a set of video, audio and/or image assets. Including their name, duration, dimensions and file size
 (2) the description of a new video you need to create from the list of assets
 
-Based on the available assets and the description, your objective issue a FFMPEG to create a new video using the assets.
-This will often involve putting assets one after the other, cropping the video format, or playing music in the background. Avoid using complex FFMPEG options, and try to keep the command as simple as possible as it will be directly paster into the terminal.
+Based on the available assets and the description, your objective is to issue a SINGLE FFMPEG command to create a new video using the assets.
+This will often involve putting assets one after the other, cropping the video format, or playing music in the background. Avoid using complex FFMPEG options, and try to keep the command as simple as possible as it will be directly pasted into the terminal.
+
+IMPORTANT: Always output exactly ONE ffmpeg command, never multiple commands chained together.
 """,
         },
         {
