@@ -139,6 +139,13 @@ YOUR FFMPEG COMMAND:
         },
     ]
     try:
+        # Print the complete prompt
+        print("\n=== COMPLETE PROMPT ===")
+        for msg in messages:
+            print(f"\n[{msg['role'].upper()}]:")
+            print(msg['content'])
+        print("=====================\n")
+
         completion = client.chat.completions.create(
             model="Qwen/Qwen2.5-Coder-32B-Instruct",
             messages=messages,
