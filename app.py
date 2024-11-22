@@ -223,7 +223,7 @@ with gr.Blocks() as demo:
                 placeholder="I want to convert to a gif under 15mb",
                 label="Instructions",
             )
-            btn = gr.Button("Run", label="Run")
+            btn = gr.Button("Run")
             with gr.Accordion("Parameters", open=False):
                 top_p = gr.Slider(
                     minimum=-0,
