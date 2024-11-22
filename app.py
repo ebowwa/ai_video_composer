@@ -226,7 +226,9 @@ def update(files, prompt, top_p=1, temperature=1):
 
             output_file_name = f"output_{uuid.uuid4()}.mp4"
             output_file_path = str((Path(temp_dir) / output_file_name).resolve())
-            subprocess.run(args + ["-y", output_file_path], cwd=temp_dir)
+            final_command = args + ["-y", output_file_path]
+            print(f"\n=== EXECUTING FFMPEG COMMAND ===\nffmpeg {' '.join(final_command[1:])}\n")
+            subprocess.run(final_command, cwd=temp_dir)
             generated_command = f"### Generated Command\n```bash\nffmpeg {' '.join(args[1:])} -y output.mp4\n```"
             return output_file_path, gr.update(value=generated_command)
         except Exception as e:
