@@ -10,7 +10,7 @@ app_file: app.py
 pinned: false
 disable_embedding: true
 models: 
-  - Qwen/Qwen2.5-72B-Instruct
+  - Qwen/Qwen2.5-Coder-32B-Instruct
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
