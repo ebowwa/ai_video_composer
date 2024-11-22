@@ -138,7 +138,18 @@ YOUR FFMPEG COMMAND:
             top_p=top_p,
             max_tokens=2048
         )
-        command = completion.choices[0].message.content.replace("\n", "")
+        content = completion.choices[0].message.content
+        # Extract command from code block if present
+        if "```" in content:
+            # Find content between ```sh or ```bash and the next ```
+            import re
+            command = re.search(r'```(?:sh|bash)?\n(.*?)\n```', content, re.DOTALL)
+            if command:
+                command = command.group(1).strip()
+            else:
+                command = content.replace("\n", "")
+        else:
+            command = content.replace("\n", "")
 
         # remove output.mp4 with the actual output file path
         command = command.replace("output.mp4", "")
