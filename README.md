@@ -1,5 +1,5 @@
 ---
-title: Video Composer GPT-4
+title: Video Composer
 emoji: 🏞
 colorFrom: red
 colorTo: yellow

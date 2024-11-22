@@ -227,9 +227,9 @@ def update(files, prompt, top_p=1, temperature=1):
 with gr.Blocks() as demo:
     gr.Markdown(
         """
-            # 🏞 GPT-4 Video Composer
-            Add video, image and audio assets and ask ChatGPT to compose a new video.
-            **Please note: This demo is not a generative AI model, it only uses GPT-4 to generate a valid FFMPEG command based on the input files and the prompt.**
+            # 🏞 Video Composer
+            Add video, image and audio assets and let Qwen2.5-Coder compose a new video.
+            **Please note: This demo is not a generative AI model, it only uses Qwen2.5-Coder to generate a valid FFMPEG command based on the input files and the prompt.**
         """,
         elem_id="header",
     )
