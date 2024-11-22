@@ -112,10 +112,15 @@ You are given:
 (1) a set of video, audio and/or image assets. Including their name, duration, dimensions and file size
 (2) the description of a new video you need to create from the list of assets
 
-Based on the available assets and the description, your objective is to issue a SINGLE FFMPEG command to create a new video using the assets.
-This will often involve putting assets one after the other, cropping the video format, or playing music in the background. Avoid using complex FFMPEG options, and try to keep the command as simple as possible as it will be directly pasted into the terminal.
+Your objective is to generate the SIMPLEST POSSIBLE single ffmpeg command to create the requested video.
+Key requirements:
+- Use the absolute minimum number of ffmpeg options needed
+- Avoid complex filter chains or filter_complex if possible
+- Prefer simple concatenation, scaling, and basic filters
+- Output exactly ONE command that will be directly pasted into the terminal
+- Never output multiple commands chained together
 
-IMPORTANT: Always output exactly ONE ffmpeg command, never multiple commands chained together.
+Remember: Simpler is better. Only use advanced ffmpeg features if absolutely necessary for the requested output.
 """,
         },
         {
