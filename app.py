@@ -13,7 +13,9 @@ import shlex
 import shutil
 from utils import format_bash_command
 
-HF_API_KEY = os.environ["HF_API_KEY"]
+HF_API_KEY = os.environ["HF_TOKEN"]
+print('caca')
+print(os.environ["HF_TOKEN"])
 client = OpenAI(
     base_url="https://api-inference.huggingface.co/v1/",
     api_key=HF_API_KEY
