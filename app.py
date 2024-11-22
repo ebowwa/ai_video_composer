@@ -233,8 +233,8 @@ with gr.Blocks() as demo:
     gr.Markdown(
         """
             # 🏞 Video Composer
-            Add video, image and audio assets and let Qwen2.5-Coder compose a new video.
-            **Please note: This demo is not a generative AI model, it only uses Qwen2.5-Coder to generate a valid FFMPEG command based on the input files and the prompt.**
+            Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) compose a new video.
+            **Please note: This demo is not a generative AI model, it only uses [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) to generate a valid FFMPEG command based on the input files and the prompt.**
         """,
         elem_id="header",
     )
