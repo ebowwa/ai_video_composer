@@ -294,7 +294,7 @@ with gr.Blocks() as demo:
             examples=[
                 [
                     ["./examples/heat-wave.mp3", "./examples/square-image.png"],
-                    "Compose a 720x720 output with the background image scaled to fill, add a full-width transparent waveform visualization positioned in center of the original audio.",
+                    "Compose a 720x720 output with the background image scaled to fill, add a full-width transparent waveform visualization positioned in center of the video.",
                     0.7,
                     0.1,
                 ],
