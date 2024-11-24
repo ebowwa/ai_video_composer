@@ -49,7 +49,8 @@ def get_files_infos(files):
         file_path = Path(file.name)
         info = {}
         info["size"] = os.path.getsize(file_path)
-        info["name"] = file_path.name
+        # Sanitize filename by replacing spaces with underscores
+        info["name"] = file_path.name.replace(" ", "_")
         file_extension = file_path.suffix
 
         if file_extension in (".mp4", ".avi", ".mkv", ".mov"):
@@ -203,10 +204,11 @@ def update(files, prompt, top_p=1, temperature=1):
             if args[0] != "ffmpeg":
                 raise Exception("Command does not start with ffmpeg")
             temp_dir = tempfile.mkdtemp()
-            # copy files to temp dir
+            # copy files to temp dir with sanitized names
             for file in files:
                 file_path = Path(file.name)
-                shutil.copy(file_path, temp_dir)
+                sanitized_name = file_path.name.replace(" ", "_")
+                shutil.copy(file_path, Path(temp_dir) / sanitized_name)
 
             # test if ffmpeg command is valid dry run
             ffmpg_dry_run = subprocess.run(
