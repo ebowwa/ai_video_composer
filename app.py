@@ -178,8 +178,7 @@ YOUR FFMPEG COMMAND:
 
         return command
     except Exception as e:
-        print("FROM OPENAI", e)
-        raise Exception("OpenAI API error")
+        raise Exception("API Error")
 
 
 def update(files, prompt, top_p=1, temperature=1):
@@ -307,12 +306,6 @@ with gr.Blocks() as demo:
                     0.1,
                 ],
                 [
-                    ["./examples/waterfall-overlay.png", "./examples/waterfall.mp4"],
-                    "Add the overlay to the video.",
-                    0.7,
-                    0.1,
-                ],
-                [
                     [
                         "./examples/cat8.jpeg",
                         "./examples/cat1.jpeg",
@@ -325,6 +318,12 @@ with gr.Blocks() as demo:
                         "./examples/heat-wave.mp3",
                     ],
                     "Generate an MP4 slideshow where each photo appears for 2 seconds, using the provided audio as soundtrack.",
+                    0.7,
+                    0.1,
+                ],
+                [
+                    ["./examples/waterfall-overlay.png", "./examples/waterfall.mp4"],
+                    "Add the overlay to the video.",
                     0.7,
                     0.1,
                 ],
