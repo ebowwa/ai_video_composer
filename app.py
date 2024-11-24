@@ -301,8 +301,8 @@ with gr.Blocks() as demo:
         gr.Examples(
             examples=[
                 [
-                    ["./examples/heat-wave.mp3", "./examples/square-image.png"],
-                    "Compose a 720x720 video with the background image scaled to fill, add a full-width transparent waveform visualization positioned in center of the video.",
+                    ["./examples/ai_talk.wav", "./examples/bg-image.png"],
+                    "Use the image as the background with a waveform visualization for the audio positioned in center of the video.",
                     0.7,
                     0.1,
                 ],
@@ -324,7 +324,7 @@ with gr.Blocks() as demo:
                         "./examples/cat7.jpeg",
                         "./examples/heat-wave.mp3",
                     ],
-                    "Make a video from the images, each image with 1s loop and add the audio as background",
+                    "Generate an MP4 slideshow where each photo appears for 2 seconds, using the provided audio as soundtrack.",
                     0.7,
                     0.1,
                 ],
