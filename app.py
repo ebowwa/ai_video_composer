@@ -106,8 +106,6 @@ def get_completion(prompt, files_info, top_p, temperature):
     messages = [
         {
             "role": "system",
-            # "content": f"""Act as a FFMPEG expert. Create a valid FFMPEG command that will be directly pasted in the terminal. Using those files: {files_info} create the FFMPEG command to achieve this: "{prompt}". Make sure it's a valid command that will not do any error. Always name the output of the FFMPEG command "output.mp4". Always use the FFMPEG overwrite option (-y). Don't produce video longer than 1 minute. Think step by step but never give any explanation, only the shell command.""",
-            # "content": f"""You'll need to create a valid FFMPEG command that will be directly pasted in the terminal. You have those files (images, videos, and audio) at your disposal: {files_info} and you need to compose a new video using FFMPEG and following those instructions: "{prompt}". You'll need to use as many assets as you can. Make sure it's a valid command that will not do any error. Always name the output of the FFMPEG command "output.mp4". Always use the FFMPEG overwrite option (-y). Try to avoid using -filter_complex option.  Don't produce video longer than 1 minute. Think step by step but never give any explanation, only the shell command.""",
             "content": """
 You are a very experienced media engineer, controlling a UNIX terminal.
 You are an FFMPEG expert with years of experience and multiple contributions to the FFMPEG project.
@@ -255,8 +253,7 @@ with gr.Blocks() as demo:
     gr.Markdown(
         """
             # 🏞 AI Video Composer
-            Compose new videos from your assets using natural language. Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) compose a new video.
-            **Please note: This demo is not a generative AI model, it only uses [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) to generate a valid FFMPEG command based on the input files and the prompt.**
+            Compose new videos from your assets using natural language. Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) generate a FFMPEG command to generate a new video.
         """,
         elem_id="header",
     )
