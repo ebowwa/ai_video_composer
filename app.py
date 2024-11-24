@@ -115,8 +115,9 @@ Key requirements:
 - Prefer simple concatenation, scaling, and basic filters
 - Output exactly ONE command that will be directly pasted into the terminal
 - Never output multiple commands chained together
-- Do not specify yuv420p pixel format - let ffmpeg choose the optimal format
 - Output the command in a single line (no line breaks or multiple lines)
+- If the user asks for waveform visualization make sure to set the mode to `line` with and the use the full width of the video
+
 
 Remember: Simpler is better. Only use advanced ffmpeg features if absolutely necessary for the requested output.
 """,
@@ -220,7 +221,7 @@ def update(files, prompt, top_p=1, temperature=1):
                 print("Command is not valid. Error output:")
                 print(ffmpg_dry_run.stderr)
                 raise Exception(
-                    "FFMPEG generated command is not valid. Please try again."
+                    "FFMPEG generated command is not valid. Please try something else."
                 )
 
             output_file_name = f"output_{uuid.uuid4()}.mp4"
