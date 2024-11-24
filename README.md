@@ -1,5 +1,5 @@
 ---
-title: Video Composer
+title: AI Video Composer
 short_description: Generate video from your assets by asking
 emoji: 🏞
 colorFrom: red
@@ -13,7 +13,7 @@ models:
   - Qwen/Qwen2.5-Coder-32B-Instruct
 ---
 
-# 🏞 Video Composer
+# 🏞 AI Video Composer
 
 Video Composer is an intelligent media processing application that uses natural language instructions to create videos from your media assets. It leverages the Qwen2.5-Coder language model to generate FFmpeg commands based on your requirements.
 

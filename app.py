@@ -243,7 +243,7 @@ def update(files, prompt, top_p=1, temperature=1):
 with gr.Blocks() as demo:
     gr.Markdown(
         """
-            # 🏞 Video Composer
+            # 🏞 AI Video Composer
             Compose new videos from your assets using natural language. Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) compose a new video.
             **Please note: This demo is not a generative AI model, it only uses [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) to generate a valid FFMPEG command based on the input files and the prompt.**
         """,
