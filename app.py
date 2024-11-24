@@ -351,4 +351,4 @@ with gr.Blocks() as demo:
             """,
         )
 demo.queue(api_open=False)
-demo.launch(show_api=False)
+demo.launch(show_api=False, ssr_mode=False)
