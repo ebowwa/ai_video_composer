@@ -120,7 +120,7 @@ Key requirements:
 
 For image sequences to video conversion:
 - Always use -framerate before input images to set FPS
-- For multiple images, use pattern matching like 'cat%d.jpeg' when possible
+- For multiple images, use pattern matching like 'img%d.jpeg' when possible
 - If pattern matching won't work, process each image with:
   * -loop 1 for each image
   * setpts filter to reset timestamps
