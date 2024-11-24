@@ -11,12 +11,10 @@ import uuid
 import tempfile
 import shlex
 import shutil
+
 HF_API_KEY = os.environ["HF_TOKEN"]
 
-client = OpenAI(
-    base_url="https://api-inference.huggingface.co/v1/",
-    api_key=HF_API_KEY
-)
+client = OpenAI(base_url="https://api-inference.huggingface.co/v1/", api_key=HF_API_KEY)
 
 allowed_medias = [
     ".png",
@@ -142,7 +140,7 @@ YOUR FFMPEG COMMAND:
         print("\n=== COMPLETE PROMPT ===")
         for msg in messages:
             print(f"\n[{msg['role'].upper()}]:")
-            print(msg['content'])
+            print(msg["content"])
         print("=====================\n")
 
         completion = client.chat.completions.create(
@@ -150,14 +148,15 @@ YOUR FFMPEG COMMAND:
             messages=messages,
             temperature=temperature,
             top_p=top_p,
-            max_tokens=2048
+            max_tokens=2048,
         )
         content = completion.choices[0].message.content
         # Extract command from code block if present
         if "```" in content:
             # Find content between ```sh or ```bash and the next ```
             import re
-            command = re.search(r'```(?:sh|bash)?\n(.*?)\n```', content, re.DOTALL)
+
+            command = re.search(r"```(?:sh|bash)?\n(.*?)\n```", content, re.DOTALL)
             if command:
                 command = command.group(1).strip()
             else:
@@ -227,7 +226,9 @@ def update(files, prompt, top_p=1, temperature=1):
             output_file_name = f"output_{uuid.uuid4()}.mp4"
             output_file_path = str((Path(temp_dir) / output_file_name).resolve())
             final_command = args + ["-y", output_file_path]
-            print(f"\n=== EXECUTING FFMPEG COMMAND ===\nffmpeg {' '.join(final_command[1:])}\n")
+            print(
+                f"\n=== EXECUTING FFMPEG COMMAND ===\nffmpeg {' '.join(final_command[1:])}\n"
+            )
             subprocess.run(final_command, cwd=temp_dir)
             generated_command = f"### Generated Command\n```bash\nffmpeg {' '.join(args[1:])} -y output.mp4\n```"
             return output_file_path, gr.update(value=generated_command)
