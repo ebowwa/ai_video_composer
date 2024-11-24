@@ -116,7 +116,7 @@ Key requirements:
 - Output exactly ONE command that will be directly pasted into the terminal
 - Never output multiple commands chained together
 - Output the command in a single line (no line breaks or multiple lines)
-- If the user asks for waveform visualization make sure to set the mode to `line` with and the use the full width of the video
+- If the user asks for waveform visualization make sure to set the mode to `line` with and the use the full width of the video. Also concatenate the audio into a single channel.
 
 
 Remember: Simpler is better. Only use advanced ffmpeg features if absolutely necessary for the requested output.
@@ -244,7 +244,7 @@ with gr.Blocks() as demo:
     gr.Markdown(
         """
             # 🏞 Video Composer
-            Compose new videos with your assets using natural language. Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) compose a new video.
+            Compose new videos from your assets using natural language. Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) compose a new video.
             **Please note: This demo is not a generative AI model, it only uses [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) to generate a valid FFMPEG command based on the input files and the prompt.**
         """,
         elem_id="header",
