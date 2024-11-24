@@ -118,6 +118,18 @@ Key requirements:
 - Output the command in a single line (no line breaks or multiple lines)
 - If the user asks for waveform visualization make sure to set the mode to `line` with and the use the full width of the video. Also concatenate the audio into a single channel.
 
+For image sequences to video conversion:
+- Always use -framerate before input images to set FPS
+- For multiple images, use pattern matching like 'cat%d.jpeg' when possible
+- If pattern matching won't work, process each image with:
+  * -loop 1 for each image
+  * setpts filter to reset timestamps
+  * trim filter to set duration
+  * scale filter to ensure consistent dimensions
+  * pad filter if needed for aspect ratio
+  * concat filter to join all segments
+Example structure for image sequence:
+ffmpeg -framerate 1 -i img%d.jpg -i audio.mp3 -filter_complex "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1,setsar=1[v]" -map "[v]" -map 1:a -t 8 output.mp4
 
 Remember: Simpler is better. Only use advanced ffmpeg features if absolutely necessary for the requested output.
 """,
