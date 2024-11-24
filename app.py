@@ -243,7 +243,7 @@ with gr.Blocks() as demo:
     gr.Markdown(
         """
             # 🏞 Video Composer
-            Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) compose a new video.
+            Compose new videos with your assets using natural language. Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) compose a new video.
             **Please note: This demo is not a generative AI model, it only uses [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B) to generate a valid FFMPEG command based on the input files and the prompt.**
         """,
         elem_id="header",
@@ -292,6 +292,18 @@ with gr.Blocks() as demo:
         gr.Examples(
             examples=[
                 [
+                    ["./examples/heat-wave.mp3", "./examples/square-image.png"],
+                    "Compose a 720x720 output with the background image scaled to fill, add a full-width transparent waveform visualization positioned in center of the original audio.",
+                    0.7,
+                    0.1,
+                ],
+                [
+                    ["./examples/waterfall-overlay.png", "./examples/waterfall.mp4"],
+                    "Add the overlay to the video.",
+                    0.7,
+                    0.1,
+                ],
+                [
                     [
                         "./examples/cat8.jpeg",
                         "./examples/cat1.jpeg",
@@ -303,34 +315,22 @@ with gr.Blocks() as demo:
                         "./examples/cat7.jpeg",
                         "./examples/heat-wave.mp3",
                     ],
-                    "make a video gif, each image with 1s loop and add the audio as background",
-                    0,
-                    0,
+                    "Make a video from the images, each image with 1s loop and add the audio as background",
+                    0.7,
+                    0.1,
                 ],
                 [
                     ["./examples/example.mp4"],
-                    "please encode this video 10 times faster",
-                    0,
-                    0,
-                ],
-                [
-                    ["./examples/heat-wave.mp3", "./examples/square-image.png"],
-                    "Make a 720x720 video, a white waveform of the audio, and finally add add the input image as the background all along the video.",
-                    0,
-                    0,
-                ],
-                [
-                    ["./examples/waterfall-overlay.png", "./examples/waterfall.mp4"],
-                    "Add the overlay to the video.",
-                    0,
-                    0,
+                    "Make this video 10 times faster",
+                    0.7,
+                    0.1,
                 ],
             ],
             inputs=[user_files, user_prompt, top_p, temperature],
             outputs=[generated_video, generated_command],
             fn=update,
             run_on_click=True,
-            cache_examples=True,
+            cache_examples=False,
         )
 
     with gr.Row():
