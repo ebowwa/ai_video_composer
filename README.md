@@ -9,17 +9,18 @@ sdk_version: 5.6.0
 app_file: app.py
 pinned: false
 disable_embedding: true
-models: 
+models:
   - Qwen/Qwen2.5-Coder-32B-Instruct
 ---
 
 # 🏞 AI Video Composer
 
-Video Composer is an intelligent media processing application that uses natural language instructions to create videos from your media assets. It leverages the Qwen2.5-Coder language model to generate FFmpeg commands based on your requirements.
+AI Video Composer is an intelligent media processing application that uses natural language instructions to create videos from your media assets. It leverages the Qwen2.5-Coder language model to generate FFmpeg commands based on your requirements.
 
 ## How It Works
 
-1. **Upload Media Files**: 
+1. **Upload Media Files**:
+
    - Supports multiple file formats including:
      - Images: .png, .jpg, .jpeg, .tiff, .bmp, .gif, .svg
      - Audio: .mp3, .wav, .ogg
@@ -28,6 +29,7 @@ Video Composer is an intelligent media processing application that uses natural 
    - Video duration limit: 2 minutes
 
 2. **Provide Instructions**:
+
    - Write natural language instructions describing how you want to process your media
    - Examples:
      - "Convert these images into a slideshow with 1 second per image"
@@ -36,6 +38,7 @@ Video Composer is an intelligent media processing application that uses natural 
      - "Create a waveform visualization for this audio file"
 
 3. **Advanced Parameters**:
+
    - Top-p (nucleus sampling): Controls diversity of generated commands (0-1)
    - Temperature: Controls randomness in command generation (0-5)
 
