@@ -350,5 +350,4 @@ with gr.Blocks() as demo:
             [![Open a Pull Request](https://huggingface.co/datasets/huggingface/badges/raw/main/open-a-pr-lg-light.svg)](https://huggingface.co/spaces/huggingface-projects/video-composer-gpt4/discussions)
             """,
         )
-demo.queue(api_open=False)
 demo.launch(show_api=False, ssr_mode=False)
