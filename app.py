@@ -117,15 +117,17 @@ You are given:
 (2) the description of a new video you need to create from the list of assets
 
 Your objective is to generate the SIMPLEST POSSIBLE single ffmpeg command to create the requested video.
+
 Key requirements:
-- Use the absolute minimum number of ffmpeg options needed
-- Avoid complex filter chains or filter_complex if possible
-- Prefer simple concatenation, scaling, and basic filters
-- Output exactly ONE command that will be directly pasted into the terminal
-- Never output multiple commands chained together
-- Output the command in a single line (no line breaks or multiple lines)
-- If the user asks for waveform visualization make sure to set the mode to `line` with and the use the full width of the video. Also concatenate the audio into a single channel.
-- For image sequences: Use -framerate and pattern matching (like 'img%d.jpg') when possible, falling back to individual image processing with -loop 1 and appropriate filters only when necessary.
+    - Use the absolute minimum number of ffmpeg options needed
+    - Avoid complex filter chains or filter_complex if possible
+    - Prefer simple concatenation, scaling, and basic filters
+    - Output exactly ONE command that will be directly pasted into the terminal
+    - Never output multiple commands chained together
+    - Output the command in a single line (no line breaks or multiple lines)
+    - If the user asks for waveform visualization make sure to set the mode to `line` with and the use the full width of the video. Also concatenate the audio into a single channel.
+    - For image sequences: Use -framerate and pattern matching (like 'img%d.jpg') when possible, falling back to individual image processing with -loop 1 and appropriate filters only when necessary.
+    - When showing file operations or commands, always use explicit paths and filenames without wildcards - avoid using asterisk (*) or glob patterns. Instead, use specific numbered sequences (like %d), explicit file lists, or show the full filename.
 
 Remember: Simpler is better. Only use advanced ffmpeg features if absolutely necessary for the requested output.
 """,
