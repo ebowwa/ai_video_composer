@@ -85,16 +85,17 @@ def get_files_infos(files):
 
 
 def get_completion(prompt, files_info, top_p, temperature):
-    files_info_string = ""
+    # Create table header
+    files_info_string = "| Type | Name | Dimensions | Duration | Audio |\n"
+    files_info_string += "|------|------|------------|-----------|--------|\n"
+    
+    # Add each file as a table row
     for file_info in files_info:
-        files_info_string += f"""{file_info["type"]} {file_info["name"]}"""
-        if file_info["type"] == "video" or file_info["type"] == "image":
-            files_info_string += f""" {file_info["dimensions"]}"""
-        if file_info["type"] == "video" or file_info["type"] == "audio":
-            files_info_string += f""" {file_info["duration"]}s"""
-        if file_info["type"] == "audio" or file_info["type"] == "video/audio":
-            files_info_string += f""" {file_info["audio_channels"]} audio channels"""
-        files_info_string += "\n"
+        dimensions = file_info.get("dimensions", "-")
+        duration = f"{file_info.get('duration', '-')}s" if "duration" in file_info else "-"
+        audio = f"{file_info.get('audio_channels', '-')} channels" if "audio_channels" in file_info else "-"
+        
+        files_info_string += f"| {file_info['type']} | {file_info['name']} | {dimensions} | {duration} | {audio} |\n"
 
     messages = [
         {
