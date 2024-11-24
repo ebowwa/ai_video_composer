@@ -117,8 +117,7 @@ Key requirements:
 - Never output multiple commands chained together
 - Output the command in a single line (no line breaks or multiple lines)
 - If the user asks for waveform visualization make sure to set the mode to `line` with and the use the full width of the video. Also concatenate the audio into a single channel.
-
-For image sequences: Use -framerate and pattern matching (like 'img%d.jpg') when possible, falling back to individual image processing with -loop 1 and appropriate filters only when necessary.
+- For image sequences: Use -framerate and pattern matching (like 'img%d.jpg') when possible, falling back to individual image processing with -loop 1 and appropriate filters only when necessary.
 
 Remember: Simpler is better. Only use advanced ffmpeg features if absolutely necessary for the requested output.
 """,
