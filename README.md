@@ -1,6 +1,6 @@
 ---
 title: AI Video Composer
-short_description: Use Qwen2.5-Coder and FFMPEG with natural language
+short_description: Create videos with FFMPEG + Qwen2.5-Coder
 emoji: 🏞
 colorFrom: red
 colorTo: yellow
