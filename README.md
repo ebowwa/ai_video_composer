@@ -1,6 +1,6 @@
 ---
 title: AI Video Composer
-short_description: Generate video from your assets by asking
+short_description: Use Qwen2.5-Coder and FFMPEG with natural language
 emoji: 🏞
 colorFrom: red
 colorTo: yellow
