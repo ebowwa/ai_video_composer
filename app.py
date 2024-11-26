@@ -19,6 +19,7 @@ client = OpenAI(base_url="https://api-inference.huggingface.co/v1/", api_key=HF_
 allowed_medias = [
     ".png",
     ".jpg",
+    ".webp",
     ".jpeg",
     ".tiff",
     ".bmp",
