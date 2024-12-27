@@ -343,7 +343,7 @@ with gr.Blocks() as demo:
                         "./examples/cat6.jpeg",
                         "./examples/heat-wave.mp3",
                     ],
-                    "Create a 3x2 grid of the cat images with the audio as background music.",
+                    "Create a 3x2 grid of the cat images with the audio as background music. Make the video duration match the audio duration.",
                     0.7,
                     0.1,
                     "deepseek-ai/DeepSeek-V3",
