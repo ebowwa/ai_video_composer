@@ -86,7 +86,7 @@ def get_files_infos(files):
     return results
 
 
-def get_completion(prompt, files_info, top_p, temperature):
+def get_completion(prompt, files_info, top_p, temperature, api_choice):
     # Create table header
     files_info_string = "| Type | Name | Dimensions | Duration | Audio Channels |\n"
     files_info_string += "|------|------|------------|-----------|--------|\n"
@@ -154,8 +154,17 @@ YOUR FFMPEG COMMAND:
             print(msg["content"])
         print("=====================\n")
 
+        if api_choice == "DeepSeek":
+            client.base_url = "https://api.deepseek.com/v1"
+            client.api_key = DEEPSEEK_API_KEY
+            model = "deepseek-chat"
+        else:
+            client.base_url = "https://api-inference.huggingface.co/v1/"
+            client.api_key = HF_API_KEY
+            model = "Qwen/Qwen2.5-Coder-32B-Instruct"
+
         completion = client.chat.completions.create(
-            model="Qwen/Qwen2.5-Coder-32B-Instruct",
+            model=model,
             messages=messages,
             temperature=temperature,
             top_p=top_p,
@@ -183,7 +192,7 @@ YOUR FFMPEG COMMAND:
         raise Exception("API Error")
 
 
-def update(files, prompt, top_p=1, temperature=1):
+def update(files, prompt, top_p=1, temperature=1, api_choice="HuggingFace"):
     if prompt == "":
         raise gr.Error("Please enter a prompt.")
 
@@ -202,7 +211,7 @@ def update(files, prompt, top_p=1, temperature=1):
     while attempts < 2:
         print("ATTEMPT", attempts)
         try:
-            command_string = get_completion(prompt, files_info, top_p, temperature)
+            command_string = get_completion(prompt, files_info, top_p, temperature, api_choice)
             print(
                 f"""///PROMTP {prompt} \n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
             )
@@ -260,6 +269,11 @@ with gr.Blocks() as demo:
     )
     with gr.Row():
         with gr.Column():
+            api_choice = gr.Radio(
+                choices=["HuggingFace", "DeepSeek"],
+                value="HuggingFace",
+                label="API Provider"
+            )
             user_files = gr.File(
                 file_count="multiple",
                 label="Media files",
@@ -295,7 +309,7 @@ with gr.Blocks() as demo:
 
         btn.click(
             fn=update,
-            inputs=[user_files, user_prompt, top_p, temperature],
+            inputs=[user_files, user_prompt, top_p, temperature, api_choice],
             outputs=[generated_video, generated_command],
         )
     with gr.Row():
