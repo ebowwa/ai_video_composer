@@ -283,7 +283,7 @@ with gr.Blocks() as demo:
                 file_types=allowed_medias,
             )
             user_prompt = gr.Textbox(
-                placeholder="I want to convert to a gif under 15mb",
+                placeholder="eg: Remove the 3 first seconds of the video",
                 label="Instructions",
             )
             btn = gr.Button("Run")
@@ -346,20 +346,6 @@ with gr.Blocks() as demo:
                         "./examples/heat-wave.mp3",
                     ],
                     "Generate an MP4 slideshow where each photo appears for 2 seconds, using the provided audio as soundtrack.",
-                    0.7,
-                    0.1,
-                    "Qwen/Qwen2.5-Coder-32B-Instruct",
-                ],
-                [
-                    ["./examples/waterfall-overlay.png", "./examples/waterfall.mp4"],
-                    "Add the overlay to the video.",
-                    0.7,
-                    0.1,
-                    "Qwen/Qwen2.5-Coder-32B-Instruct",
-                ],
-                [
-                    ["./examples/example.mp4"],
-                    "Make this video 10 times faster",
                     0.7,
                     0.1,
                     "Qwen/Qwen2.5-Coder-32B-Instruct",
