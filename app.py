@@ -86,7 +86,7 @@ def get_files_infos(files):
     return results
 
 
-def get_completion(prompt, files_info, top_p, temperature, api_choice):
+def get_completion(prompt, files_info, top_p, temperature, model_choice):
     # Create table header
     files_info_string = "| Type | Name | Dimensions | Duration | Audio Channels |\n"
     files_info_string += "|------|------|------------|-----------|--------|\n"
@@ -154,10 +154,10 @@ YOUR FFMPEG COMMAND:
             print(msg["content"])
         print("=====================\n")
 
-        if api_choice == "DeepSeek":
+        if model_choice == "deepseek-ai/DeepSeek-V3-Base":
             client.base_url = "https://api.deepseek.com/v1"
             client.api_key = DEEPSEEK_API_KEY
-            model = "deepseek-chat"
+            model = "deepseek-ai/DeepSeek-V3-Base"
         else:
             client.base_url = "https://api-inference.huggingface.co/v1/"
             client.api_key = HF_API_KEY
@@ -192,7 +192,7 @@ YOUR FFMPEG COMMAND:
         raise Exception("API Error")
 
 
-def update(files, prompt, top_p=1, temperature=1, api_choice="HuggingFace"):
+def update(files, prompt, top_p=1, temperature=1, model_choice="Qwen/Qwen2.5-Coder-32B-Instruct"):
     if prompt == "":
         raise gr.Error("Please enter a prompt.")
 
@@ -280,10 +280,10 @@ with gr.Blocks() as demo:
             )
             btn = gr.Button("Run")
             with gr.Accordion("Parameters", open=False):
-                api_choice = gr.Radio(
-                    choices=["HuggingFace", "DeepSeek"],
-                    value="DeepSeek",
-                    label="API Provider"
+                model_choice = gr.Radio(
+                    choices=["Qwen/Qwen2.5-Coder-32B-Instruct", "deepseek-ai/DeepSeek-V3-Base"],
+                    value="deepseek-ai/DeepSeek-V3-Base",
+                    label="Model"
                 )
                 top_p = gr.Slider(
                     minimum=-0,
@@ -309,7 +309,7 @@ with gr.Blocks() as demo:
 
         btn.click(
             fn=update,
-            inputs=[user_files, user_prompt, top_p, temperature, api_choice],
+            inputs=[user_files, user_prompt, top_p, temperature, model_choice],
             outputs=[generated_video, generated_command],
         )
     with gr.Row():
@@ -320,7 +320,7 @@ with gr.Blocks() as demo:
                     "Use the image as the background with a waveform visualization for the audio positioned in center of the video.",
                     0.7,
                     0.1,
-                    "HuggingFace",
+                    "Qwen/Qwen2.5-Coder-32B-Instruct",
                 ],
                 [
                     [
@@ -337,21 +337,21 @@ with gr.Blocks() as demo:
                     "Generate an MP4 slideshow where each photo appears for 2 seconds, using the provided audio as soundtrack.",
                     0.7,
                     0.1,
-                    "HuggingFace",
+                    "Qwen/Qwen2.5-Coder-32B-Instruct",
                 ],
                 [
                     ["./examples/waterfall-overlay.png", "./examples/waterfall.mp4"],
                     "Add the overlay to the video.",
                     0.7,
                     0.1,
-                    "HuggingFace",
+                    "Qwen/Qwen2.5-Coder-32B-Instruct",
                 ],
                 [
                     ["./examples/example.mp4"],
                     "Make this video 10 times faster",
                     0.7,
                     0.1,
-                    "HuggingFace",
+                    "Qwen/Qwen2.5-Coder-32B-Instruct",
                 ],
                 [
                     [
@@ -362,7 +362,7 @@ with gr.Blocks() as demo:
                     "Create a music video where the waterfall plays in slow motion (0.5x speed) with the heat wave audio track, and the square image appears as a rotating album cover in the bottom right corner",
                     0.7,
                     0.1,
-                    "DeepSeek",
+                    "deepseek-ai/DeepSeek-V3-Base",
                 ],
                 [
                     [
@@ -379,7 +379,7 @@ with gr.Blocks() as demo:
                     "Create a cat montage where each cat image zooms in and out sequentially for 2 seconds each, synchronized with the audio track, and add a vintage film grain effect",
                     0.7,
                     0.1,
-                    "DeepSeek",
+                    "deepseek-ai/DeepSeek-V3-Base",
                 ],
                 [
                     [
@@ -390,7 +390,7 @@ with gr.Blocks() as demo:
                     "Create a picture-in-picture effect with the example video in the bottom right corner, the waterfall overlay as a semi-transparent watermark, and the background image filling the rest of the frame",
                     0.7,
                     0.1,
-                    "DeepSeek",
+                    "deepseek-ai/DeepSeek-V3-Base",
                 ],
             ],
             inputs=[user_files, user_prompt, top_p, temperature, api_choice],
