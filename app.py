@@ -154,10 +154,10 @@ YOUR FFMPEG COMMAND:
             print(msg["content"])
         print("=====================\n")
 
-        if model_choice == "deepseek-ai/DeepSeek-V3-Base":
+        if model_choice == "deepseek-ai/DeepSeek-V3":
             client.base_url = "https://api.deepseek.com/v1"
             client.api_key = DEEPSEEK_API_KEY
-            model = "deepseek-ai/DeepSeek-V3-Base"
+            model = "deepseek-ai/DeepSeek-V3"
         else:
             client.base_url = "https://api-inference.huggingface.co/v1/"
             client.api_key = HF_API_KEY
@@ -192,7 +192,13 @@ YOUR FFMPEG COMMAND:
         raise Exception("API Error")
 
 
-def update(files, prompt, top_p=1, temperature=1, model_choice="Qwen/Qwen2.5-Coder-32B-Instruct"):
+def update(
+    files,
+    prompt,
+    top_p=1,
+    temperature=1,
+    model_choice="Qwen/Qwen2.5-Coder-32B-Instruct",
+):
     if prompt == "":
         raise gr.Error("Please enter a prompt.")
 
@@ -211,7 +217,9 @@ def update(files, prompt, top_p=1, temperature=1, model_choice="Qwen/Qwen2.5-Cod
     while attempts < 2:
         print("ATTEMPT", attempts)
         try:
-            command_string = get_completion(prompt, files_info, top_p, temperature, model_choice)
+            command_string = get_completion(
+                prompt, files_info, top_p, temperature, model_choice
+            )
             print(
                 f"""///PROMTP {prompt} \n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
             )
@@ -281,9 +289,12 @@ with gr.Blocks() as demo:
             btn = gr.Button("Run")
             with gr.Accordion("Parameters", open=False):
                 model_choice = gr.Radio(
-                    choices=["Qwen/Qwen2.5-Coder-32B-Instruct", "deepseek-ai/DeepSeek-V3-Base"],
-                    value="deepseek-ai/DeepSeek-V3-Base",
-                    label="Model"
+                    choices=[
+                        "Qwen/Qwen2.5-Coder-32B-Instruct",
+                        "deepseek-ai/DeepSeek-V3",
+                    ],
+                    value="deepseek-ai/DeepSeek-V3",
+                    label="Model",
                 )
                 top_p = gr.Slider(
                     minimum=-0,
@@ -357,12 +368,12 @@ with gr.Blocks() as demo:
                     [
                         "./examples/waterfall.mp4",
                         "./examples/heat-wave.mp3",
-                        "./examples/square-image.png"
+                        "./examples/square-image.png",
                     ],
                     "Create a music video where the waterfall plays in slow motion (0.5x speed) with the heat wave audio track, and the square image appears as a rotating album cover in the bottom right corner",
                     0.7,
                     0.1,
-                    "deepseek-ai/DeepSeek-V3-Base",
+                    "deepseek-ai/DeepSeek-V3",
                 ],
                 [
                     [
@@ -374,23 +385,23 @@ with gr.Blocks() as demo:
                         "./examples/cat6.jpeg",
                         "./examples/cat7.jpeg",
                         "./examples/cat8.jpeg",
-                        "./examples/ai_talk.wav"
+                        "./examples/ai_talk.wav",
                     ],
                     "Create a cat montage where each cat image zooms in and out sequentially for 2 seconds each, synchronized with the audio track, and add a vintage film grain effect",
                     0.7,
                     0.1,
-                    "deepseek-ai/DeepSeek-V3-Base",
+                    "deepseek-ai/DeepSeek-V3",
                 ],
                 [
                     [
                         "./examples/waterfall-overlay.png",
                         "./examples/bg-image.png",
-                        "./examples/example.mp4"
+                        "./examples/example.mp4",
                     ],
                     "Create a picture-in-picture effect with the example video in the bottom right corner, the waterfall overlay as a semi-transparent watermark, and the background image filling the rest of the frame",
                     0.7,
                     0.1,
-                    "deepseek-ai/DeepSeek-V3-Base",
+                    "deepseek-ai/DeepSeek-V3",
                 ],
             ],
             inputs=[user_files, user_prompt, top_p, temperature, model_choice],
