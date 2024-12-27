@@ -320,6 +320,7 @@ with gr.Blocks() as demo:
                     "Use the image as the background with a waveform visualization for the audio positioned in center of the video.",
                     0.7,
                     0.1,
+                    "HuggingFace",
                 ],
                 [
                     [
@@ -336,21 +337,24 @@ with gr.Blocks() as demo:
                     "Generate an MP4 slideshow where each photo appears for 2 seconds, using the provided audio as soundtrack.",
                     0.7,
                     0.1,
+                    "HuggingFace",
                 ],
                 [
                     ["./examples/waterfall-overlay.png", "./examples/waterfall.mp4"],
                     "Add the overlay to the video.",
                     0.7,
                     0.1,
+                    "HuggingFace",
                 ],
                 [
                     ["./examples/example.mp4"],
                     "Make this video 10 times faster",
                     0.7,
                     0.1,
+                    "HuggingFace",
                 ],
             ],
-            inputs=[user_files, user_prompt, top_p, temperature],
+            inputs=[user_files, user_prompt, top_p, temperature, api_choice],
             outputs=[generated_video, generated_command],
             fn=update,
             run_on_click=True,
