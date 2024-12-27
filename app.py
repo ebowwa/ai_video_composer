@@ -210,8 +210,8 @@ def update(
                 raise gr.Error(
                     "Please make sure all videos are less than 2 minute long."
                 )
-        if file_info["size"] > 10000000:
-            raise gr.Error("Please make sure all files are less than 10MB in size.")
+        if file_info["size"] > 100000000:
+            raise gr.Error("Please make sure all files are less than 100MB in size.")
 
     attempts = 0
     while attempts < 2:
