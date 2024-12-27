@@ -357,7 +357,7 @@ with gr.Blocks() as demo:
                         "./examples/cat5.jpeg",
                         "./examples/cat6.jpeg",
                     ],
-                    "Create a slideshow where each image is shown for 2 seconds with a continuous slight zoom effect.",
+                    "Create a smooth slideshow where each image is shown for exactly 2 seconds. Apply a continuous subtle zoom-in effect on each image that starts at 100% scale and ends at 110% scale. Use smooth transitions between images. Match the total duration to the number of images multiplied by 2 seconds.",
                     0.7,
                     0.1,
                     "deepseek-ai/DeepSeek-V3",
