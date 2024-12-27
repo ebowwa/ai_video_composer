@@ -362,7 +362,7 @@ with gr.Blocks() as demo:
                     "Create a video with the waterfall playing, add the heat wave audio track, and overlay the waterfall overlay image in the top right corner with 50% opacity",
                     0.7,
                     0.1,
-                    "HuggingFace",
+                    "DeepSeek",
                 ],
                 [
                     [
@@ -379,7 +379,7 @@ with gr.Blocks() as demo:
                     "Create a video collage where all cat images are arranged in a 3x3 grid on top of the background image, with each image appearing for 3 seconds",
                     0.7,
                     0.1,
-                    "HuggingFace",
+                    "DeepSeek",
                 ],
                 [
                     [
@@ -390,7 +390,7 @@ with gr.Blocks() as demo:
                     "Create a video with the waterfall playing in the background, the square image in the center with a circular mask, and a waveform visualization of the audio track at the bottom",
                     0.7,
                     0.1,
-                    "HuggingFace",
+                    "DeepSeek",
                 ],
             ],
             inputs=[user_files, user_prompt, top_p, temperature, api_choice],
