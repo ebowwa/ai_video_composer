@@ -157,7 +157,7 @@ YOUR FFMPEG COMMAND:
         if model_choice == "deepseek-ai/DeepSeek-V3":
             client.base_url = "https://api.deepseek.com/v1"
             client.api_key = DEEPSEEK_API_KEY
-            model = "deepseek-ai/DeepSeek-V3"
+            model = "deepseek-chat"
         else:
             client.base_url = "https://api-inference.huggingface.co/v1/"
             client.api_key = HF_API_KEY
