@@ -353,6 +353,45 @@ with gr.Blocks() as demo:
                     0.1,
                     "HuggingFace",
                 ],
+                [
+                    [
+                        "./examples/waterfall.mp4",
+                        "./examples/heat-wave.mp3",
+                        "./examples/waterfall-overlay.png"
+                    ],
+                    "Create a video with the waterfall playing, add the heat wave audio track, and overlay the waterfall overlay image in the top right corner with 50% opacity",
+                    0.7,
+                    0.1,
+                    "HuggingFace",
+                ],
+                [
+                    [
+                        "./examples/cat1.jpeg",
+                        "./examples/cat2.jpeg",
+                        "./examples/cat3.jpeg",
+                        "./examples/cat4.jpeg",
+                        "./examples/cat5.jpeg",
+                        "./examples/cat6.jpeg",
+                        "./examples/cat7.jpeg",
+                        "./examples/cat8.jpeg",
+                        "./examples/bg-image.png"
+                    ],
+                    "Create a video collage where all cat images are arranged in a 3x3 grid on top of the background image, with each image appearing for 3 seconds",
+                    0.7,
+                    0.1,
+                    "HuggingFace",
+                ],
+                [
+                    [
+                        "./examples/ai_talk.wav",
+                        "./examples/square-image.png",
+                        "./examples/waterfall.mp4"
+                    ],
+                    "Create a video with the waterfall playing in the background, the square image in the center with a circular mask, and a waveform visualization of the audio track at the bottom",
+                    0.7,
+                    0.1,
+                    "HuggingFace",
+                ],
             ],
             inputs=[user_files, user_prompt, top_p, temperature, api_choice],
             outputs=[generated_video, generated_command],
