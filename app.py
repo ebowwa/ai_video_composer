@@ -357,9 +357,9 @@ with gr.Blocks() as demo:
                     [
                         "./examples/waterfall.mp4",
                         "./examples/heat-wave.mp3",
-                        "./examples/waterfall-overlay.png"
+                        "./examples/square-image.png"
                     ],
-                    "Create a video with the waterfall playing, add the heat wave audio track, and overlay the waterfall overlay image in the top right corner with 50% opacity",
+                    "Create a music video where the waterfall plays in slow motion (0.5x speed) with the heat wave audio track, and the square image appears as a rotating album cover in the bottom right corner",
                     0.7,
                     0.1,
                     "DeepSeek",
@@ -374,20 +374,20 @@ with gr.Blocks() as demo:
                         "./examples/cat6.jpeg",
                         "./examples/cat7.jpeg",
                         "./examples/cat8.jpeg",
-                        "./examples/bg-image.png"
+                        "./examples/ai_talk.wav"
                     ],
-                    "Create a video collage where all cat images are arranged in a 3x3 grid on top of the background image, with each image appearing for 3 seconds",
+                    "Create a cat montage where each cat image zooms in and out sequentially for 2 seconds each, synchronized with the audio track, and add a vintage film grain effect",
                     0.7,
                     0.1,
                     "DeepSeek",
                 ],
                 [
                     [
-                        "./examples/ai_talk.wav",
-                        "./examples/square-image.png",
-                        "./examples/waterfall.mp4"
+                        "./examples/waterfall-overlay.png",
+                        "./examples/bg-image.png",
+                        "./examples/example.mp4"
                     ],
-                    "Create a video with the waterfall playing in the background, the square image in the center with a circular mask, and a waveform visualization of the audio track at the bottom",
+                    "Create a picture-in-picture effect with the example video in the bottom right corner, the waterfall overlay as a semi-transparent watermark, and the background image filling the rest of the frame",
                     0.7,
                     0.1,
                     "DeepSeek",
