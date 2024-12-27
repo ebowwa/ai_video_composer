@@ -334,6 +334,13 @@ with gr.Blocks() as demo:
                     "Qwen/Qwen2.5-Coder-32B-Instruct",
                 ],
                 [
+                    ["./examples/ai_talk.wav", "./examples/bg-image.png"],
+                    "Use the image as the background with a waveform visualization for the audio positioned in center of the video.",
+                    0.7,
+                    0.1,
+                    "deepseek-ai/DeepSeek-V3",
+                ],
+                [
                     [
                         "./examples/cat1.jpeg",
                         "./examples/cat2.jpeg",
