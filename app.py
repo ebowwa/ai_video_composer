@@ -335,7 +335,7 @@ with gr.Blocks() as demo:
                 ],
                 [
                     ["./examples/ai_talk.wav", "./examples/bg-image.png"],
-                    "Use the image as the background with a waveform visualization for the audio positioned in center of the video.",
+                    "Use the image as the background with a waveform visualization for the audio positioned in center of the video. Make sure the waveform has a max height of 250 pixels.",
                     0.7,
                     0.1,
                     "deepseek-ai/DeepSeek-V3",
