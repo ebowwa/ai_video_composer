@@ -282,7 +282,7 @@ with gr.Blocks() as demo:
             with gr.Accordion("Parameters", open=False):
                 api_choice = gr.Radio(
                     choices=["HuggingFace", "DeepSeek"],
-                    value="HuggingFace",
+                    value="DeepSeek",
                     label="API Provider"
                 )
                 top_p = gr.Slider(
