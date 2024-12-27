@@ -269,11 +269,6 @@ with gr.Blocks() as demo:
     )
     with gr.Row():
         with gr.Column():
-            api_choice = gr.Radio(
-                choices=["HuggingFace", "DeepSeek"],
-                value="HuggingFace",
-                label="API Provider"
-            )
             user_files = gr.File(
                 file_count="multiple",
                 label="Media files",
@@ -285,6 +280,11 @@ with gr.Blocks() as demo:
             )
             btn = gr.Button("Run")
             with gr.Accordion("Parameters", open=False):
+                api_choice = gr.Radio(
+                    choices=["HuggingFace", "DeepSeek"],
+                    value="HuggingFace",
+                    label="API Provider"
+                )
                 top_p = gr.Slider(
                     minimum=-0,
                     maximum=1.0,
