@@ -271,7 +271,7 @@ with gr.Blocks() as demo:
     gr.Markdown(
         """
             # 🏞 AI Video Composer
-            Compose new videos from your assets using natural language. Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) generate a new video for you (using FFMPEG).
+            Compose new videos from your assets using natural language. Add video, image and audio assets and let [Qwen2.5-Coder](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) or [DeepSeek-V3](https://www.deepseek.com/) generate a new video for you (using FFMPEG).
         """,
         elem_id="header",
     )
