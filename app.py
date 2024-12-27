@@ -13,6 +13,7 @@ import shlex
 import shutil
 
 HF_API_KEY = os.environ["HF_TOKEN"]
+DEEPSEEK_API_KEY = os.environ["DEEPSEEK_API_KEY"]
 
 client = OpenAI(base_url="https://api-inference.huggingface.co/v1/", api_key=HF_API_KEY)
 
