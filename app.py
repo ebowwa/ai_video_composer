@@ -211,7 +211,7 @@ def update(files, prompt, top_p=1, temperature=1, model_choice="Qwen/Qwen2.5-Cod
     while attempts < 2:
         print("ATTEMPT", attempts)
         try:
-            command_string = get_completion(prompt, files_info, top_p, temperature, api_choice)
+            command_string = get_completion(prompt, files_info, top_p, temperature, model_choice)
             print(
                 f"""///PROMTP {prompt} \n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
             )
@@ -393,7 +393,7 @@ with gr.Blocks() as demo:
                     "deepseek-ai/DeepSeek-V3-Base",
                 ],
             ],
-            inputs=[user_files, user_prompt, top_p, temperature, api_choice],
+            inputs=[user_files, user_prompt, top_p, temperature, model_choice],
             outputs=[generated_video, generated_command],
             fn=update,
             run_on_click=True,
