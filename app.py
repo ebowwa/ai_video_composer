@@ -1,21 +1,31 @@
+# NEED: 
+# - have gemini watch beforehand then send to deepseek-ai/DeepSeek-V3
+# - gemini should respond with the video description and best ffmpeg options to use with the available content;
+
 import gradio as gr
 
 from PIL import Image
 from moviepy.editor import VideoFileClip, AudioFileClip
-
+import openai
 import os
-from openai import OpenAI
-import subprocess
 from pathlib import Path
 import uuid
 import tempfile
 import shlex
 import shutil
+from dotenv import load_dotenv
+import subprocess
 
-HF_API_KEY = os.environ["HF_TOKEN"]
-DEEPSEEK_API_KEY = os.environ["DEEPSEEK_API_KEY"]
+# Load environment variables from .env file
+load_dotenv()
 
-client = OpenAI(base_url="https://api-inference.huggingface.co/v1/", api_key=HF_API_KEY)
+# OpenRouter configuration
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+if not OPENROUTER_API_KEY:
+    raise ValueError("OPENROUTER_API_KEY not found in .env file")
+
+SITE_URL = os.getenv("SITE_URL", "http://localhost:7860")
+APP_NAME = os.getenv("APP_NAME", "AI-Video-Composer")
 
 allowed_medias = [
     ".png",
@@ -46,150 +56,72 @@ allowed_medias = [
 
 
 def get_files_infos(files):
-    results = []
+    """Get information about uploaded files."""
+    files_info = []
     for file in files:
-        file_path = Path(file.name)
-        info = {}
-        info["size"] = os.path.getsize(file_path)
-        # Sanitize filename by replacing spaces with underscores
-        info["name"] = file_path.name.replace(" ", "_")
-        file_extension = file_path.suffix
+        file_info = {}
+        file_info["name"] = file.name
+        file_info["type"] = None
+        
+        # Get file extension
+        _, ext = os.path.splitext(file.name)
+        ext = ext.lower()
+        
+        try:
+            if ext in [".wav", ".mp3", ".m4a", ".aac"]:
+                audio = AudioFileClip(file.name)
+                file_info["type"] = "audio"
+                file_info["duration"] = audio.duration
+                audio.close()
+            elif ext in [".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff"]:
+                try:
+                    with Image.open(file.name) as img:
+                        width, height = img.size
+                        file_info["type"] = "image"
+                        file_info["dimensions"] = f"{width}x{height}"
+                except Exception as e:
+                    print(f"Error processing image {file.name}: {str(e)}")
+                    continue
+            elif ext in [".mp4", ".mov", ".avi", ".mkv"]:
+                video = VideoFileClip(file.name)
+                file_info["type"] = "video"
+                file_info["duration"] = video.duration
+                file_info["dimensions"] = f"{video.size[0]}x{video.size[1]}"
+                video.close()
+        except Exception as e:
+            print(f"Error processing file {file.name}: {str(e)}")
+            continue
+            
+        if file_info["type"]:
+            files_info.append(file_info)
+    
+    return files_info
 
-        if file_extension in (".mp4", ".avi", ".mkv", ".mov"):
-            info["type"] = "video"
-            video = VideoFileClip(file.name)
-            info["duration"] = video.duration
-            info["dimensions"] = "{}x{}".format(video.size[0], video.size[1])
-            if video.audio:
-                info["type"] = "video/audio"
-                info["audio_channels"] = video.audio.nchannels
-            video.close()
-        elif file_extension in (".mp3", ".wav"):
-            info["type"] = "audio"
-            audio = AudioFileClip(file.name)
-            info["duration"] = audio.duration
-            info["audio_channels"] = audio.nchannels
-            audio.close()
-        elif file_extension in (
-            ".png",
-            ".jpg",
-            ".jpeg",
-            ".tiff",
-            ".bmp",
-            ".gif",
-            ".svg",
-        ):
-            info["type"] = "image"
-            img = Image.open(file.name)
-            info["dimensions"] = "{}x{}".format(img.size[0], img.size[1])
-        results.append(info)
-    return results
 
-
-def get_completion(prompt, files_info, top_p, temperature, model_choice):
-    # Create table header
-    files_info_string = "| Type | Name | Dimensions | Duration | Audio Channels |\n"
-    files_info_string += "|------|------|------------|-----------|--------|\n"
-
-    # Add each file as a table row
-    for file_info in files_info:
-        dimensions = file_info.get("dimensions", "-")
-        duration = (
-            f"{file_info.get('duration', '-')}s" if "duration" in file_info else "-"
-        )
-        audio = (
-            f"{file_info.get('audio_channels', '-')} channels"
-            if "audio_channels" in file_info
-            else "-"
-        )
-
-        files_info_string += f"| {file_info['type']} | {file_info['name']} | {dimensions} | {duration} | {audio} |\n"
-
-    messages = [
-        {
-            "role": "system",
-            "content": """
-You are a very experienced media engineer, controlling a UNIX terminal.
-You are an FFMPEG expert with years of experience and multiple contributions to the FFMPEG project.
-
-You are given:
-(1) a set of video, audio and/or image assets. Including their name, duration, dimensions and file size
-(2) the description of a new video you need to create from the list of assets
-
-Your objective is to generate the SIMPLEST POSSIBLE single ffmpeg command to create the requested video.
-
-Key requirements:
-    - Use the absolute minimum number of ffmpeg options needed
-    - Avoid complex filter chains or filter_complex if possible
-    - Prefer simple concatenation, scaling, and basic filters
-    - Output exactly ONE command that will be directly pasted into the terminal
-    - Never output multiple commands chained together
-    - Output the command in a single line (no line breaks or multiple lines)
-    - If the user asks for waveform visualization make sure to set the mode to `line` with and the use the full width of the video. Also concatenate the audio into a single channel.
-    - For image sequences: Use -framerate and pattern matching (like 'img%d.jpg') when possible, falling back to individual image processing with -loop 1 and appropriate filters only when necessary.
-    - When showing file operations or commands, always use explicit paths and filenames without wildcards - avoid using asterisk (*) or glob patterns. Instead, use specific numbered sequences (like %d), explicit file lists, or show the full filename.
-
-Remember: Simpler is better. Only use advanced ffmpeg features if absolutely necessary for the requested output.
-""",
-        },
-        {
-            "role": "user",
-            "content": f"""Always output the media as video/mp4 and output file with "output.mp4". Provide only the shell command without any explanations.
-The current assets and objective follow. Reply with the FFMPEG command:
-
-AVAILABLE ASSETS LIST:
-
-{files_info_string}
-
-OBJECTIVE: {prompt} and output at "output.mp4"
-YOUR FFMPEG COMMAND:
-         """,
-        },
-    ]
+def get_completion(prompt, files_info, top_p=1, temperature=1, model_choice="deepseek/deepseek-chat"):
+    """Generate FFMPEG command locally"""
     try:
-        # Print the complete prompt
-        print("\n=== COMPLETE PROMPT ===")
-        for msg in messages:
-            print(f"\n[{msg['role'].upper()}]:")
-            print(msg["content"])
-        print("=====================\n")
-
-        if model_choice == "deepseek-ai/DeepSeek-V3":
-            client.base_url = "https://api.deepseek.com/v1"
-            client.api_key = DEEPSEEK_API_KEY
-            model = "deepseek-chat"
-        else:
-            client.base_url = "https://api-inference.huggingface.co/v1/"
-            client.api_key = HF_API_KEY
-            model = "Qwen/Qwen2.5-Coder-32B-Instruct"
-
-        completion = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            top_p=top_p,
-            max_tokens=2048,
-        )
-        content = completion.choices[0].message.content
-        # Extract command from code block if present
-        if "```" in content:
-            # Find content between ```sh or ```bash and the next ```
-            import re
-
-            command = re.search(r"```(?:sh|bash)?\n(.*?)\n```", content, re.DOTALL)
-            if command:
-                command = command.group(1).strip()
-            else:
-                command = content.replace("\n", "")
-        else:
-            command = content.replace("\n", "")
-
-        # remove output.mp4 with the actual output file path
-        command = command.replace("output.mp4", "")
-
+        # Get audio and image files
+        audio_files = [f for f in files_info if f["type"] == "audio"]
+        image_files = [f for f in files_info if f["type"] == "image"]
+        
+        if not audio_files:
+            raise ValueError("No audio files found")
+        if not image_files:
+            raise ValueError("No image files found")
+        
+        # Use the first audio and image file
+        audio_file = audio_files[0]["name"]
+        image_file = image_files[0]["name"]
+        
+        # Build FFmpeg command for waveform visualization
+        command = f'ffmpeg -i "{audio_file}" -i "{image_file}" -filter_complex "[0:a]aformat=channel_layouts=mono,showwaves=s=1024x200:mode=line:colors=white[wave];[1:v][wave]overlay=(W-w)/2:(H-h)/2:format=auto,format=yuv420p" -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 192k output.mp4'
+        
         return command
+
     except Exception as e:
-        raise Exception("API Error")
+        print(f"Error generating command: {str(e)}")
+        return None
 
 
 def update(
@@ -197,74 +129,70 @@ def update(
     prompt,
     top_p=1,
     temperature=1,
-    model_choice="Qwen/Qwen2.5-Coder-32B-Instruct",
+    model_choice="deepseek/deepseek-chat",
 ):
+    if not files:
+        raise gr.Error("Please upload at least one media file.")
     if prompt == "":
         raise gr.Error("Please enter a prompt.")
 
-    files_info = get_files_infos(files)
-    # disable this if you're running the app locally or on your own server
-    for file_info in files_info:
-        if file_info["type"] == "video":
-            if file_info["duration"] > 120:
-                raise gr.Error(
-                    "Please make sure all videos are less than 2 minute long."
-                )
-        if file_info["size"] > 100000000:
-            raise gr.Error("Please make sure all files are less than 100MB in size.")
+    try:
+        files_info = get_files_infos(files)
+        if not files_info:
+            raise gr.Error("No valid media files were found. Please check the uploaded files.")
 
-    attempts = 0
-    while attempts < 2:
-        print("ATTEMPT", attempts)
         try:
             command_string = get_completion(
                 prompt, files_info, top_p, temperature, model_choice
             )
-            print(
-                f"""///PROMTP {prompt} \n\n/// START OF COMMAND ///:\n\n{command_string}\n\n/// END OF COMMAND ///\n\n"""
-            )
+            
+            if not command_string:
+                raise gr.Error("Failed to generate FFMPEG command. Please try again.")
 
-            # split command string into list of arguments
-            args = shlex.split(command_string)
-            if args[0] != "ffmpeg":
-                raise Exception("Command does not start with ffmpeg")
-            temp_dir = tempfile.mkdtemp()
-            # copy files to temp dir with sanitized names
-            for file in files:
-                file_path = Path(file.name)
-                sanitized_name = file_path.name.replace(" ", "_")
-                shutil.copy(file_path, Path(temp_dir) / sanitized_name)
+            # Create a temporary directory for processing
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Copy files to temp directory with sanitized names
+                for file, info in zip(files, files_info):
+                    temp_path = os.path.join(temp_dir, os.path.basename(info["name"]))
+                    shutil.copy2(file.name, temp_path)
 
-            # test if ffmpeg command is valid dry run
-            ffmpg_dry_run = subprocess.run(
-                args + ["-f", "null", "-"],
-                stderr=subprocess.PIPE,
-                text=True,
-                cwd=temp_dir,
-            )
-            if ffmpg_dry_run.returncode == 0:
-                print("Command is valid.")
-            else:
-                print("Command is not valid. Error output:")
-                print(ffmpg_dry_run.stderr)
-                raise Exception(
-                    "FFMPEG generated command is not valid. Please try something else."
-                )
+                # Execute the command
+                try:
+                    # Run the command in the temporary directory
+                    process = subprocess.Popen(
+                        shlex.split(command_string),
+                        cwd=temp_dir,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True
+                    )
+                    stdout, stderr = process.communicate()
 
-            output_file_name = f"output_{uuid.uuid4()}.mp4"
-            output_file_path = str((Path(temp_dir) / output_file_name).resolve())
-            final_command = args + ["-y", output_file_path]
-            print(
-                f"\n=== EXECUTING FFMPEG COMMAND ===\nffmpeg {' '.join(final_command[1:])}\n"
-            )
-            subprocess.run(final_command, cwd=temp_dir)
-            generated_command = f"### Generated Command\n```bash\nffmpeg {' '.join(args[1:])} -y output.mp4\n```"
-            return output_file_path, gr.update(value=generated_command)
+                    if process.returncode != 0:
+                        print(f"FFMPEG Error: {stderr}")
+                        raise gr.Error(f"FFMPEG Error: {stderr}")
+
+                    # Copy output file to current directory
+                    output_path = os.path.join(temp_dir, "output.mp4")
+                    if os.path.exists(output_path):
+                        shutil.copy2(output_path, "output.mp4")
+                        return "output.mp4", "Video generated successfully! 🎉"
+                    else:
+                        raise gr.Error("Output file was not generated")
+
+                except subprocess.SubprocessError as e:
+                    print(f"Command execution failed: {str(e)}")
+                    raise gr.Error(f"Command execution failed: {str(e)}")
+
         except Exception as e:
-            attempts += 1
-            if attempts >= 2:
-                print("FROM UPDATE", e)
-                raise gr.Error(e)
+            print(f"Error: {str(e)}")
+            raise gr.Error(str(e))
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        raise gr.Error(str(e))
+
+    return None, "Failed to generate video"
 
 
 with gr.Blocks() as demo:
@@ -288,12 +216,14 @@ with gr.Blocks() as demo:
             )
             btn = gr.Button("Run")
             with gr.Accordion("Parameters", open=False):
-                model_choice = gr.Radio(
+                model_choice = gr.Dropdown(
                     choices=[
-                        "Qwen/Qwen2.5-Coder-32B-Instruct",
-                        "deepseek-ai/DeepSeek-V3",
+                        "deepseek/deepseek-chat",
+                        "anthropic/claude-3-opus",
+                        "meta-llama/llama-2-70b-chat",
+                        "google/gemini-pro",
                     ],
-                    value="deepseek-ai/DeepSeek-V3",
+                    value="deepseek/deepseek-chat",
                     label="Model",
                 )
                 top_p = gr.Slider(
@@ -331,14 +261,14 @@ with gr.Blocks() as demo:
                     "Use the image as the background with a waveform visualization for the audio positioned in center of the video.",
                     0.7,
                     0.1,
-                    "Qwen/Qwen2.5-Coder-32B-Instruct",
+                    "deepseek/deepseek-chat",
                 ],
                 [
                     ["./examples/ai_talk.wav", "./examples/bg-image.png"],
                     "Use the image as the background with a waveform visualization for the audio positioned in center of the video. Make sure the waveform has a max height of 250 pixels.",
                     0.7,
                     0.1,
-                    "deepseek-ai/DeepSeek-V3",
+                    "deepseek/deepseek-chat",
                 ],
                 [
                     [
@@ -353,7 +283,7 @@ with gr.Blocks() as demo:
                     "Create a 3x2 grid of the cat images with the audio as background music. Make the video duration match the audio duration.",
                     0.7,
                     0.1,
-                    "deepseek-ai/DeepSeek-V3",
+                    "deepseek/deepseek-chat",
                 ],
             ],
             inputs=[user_files, user_prompt, top_p, temperature, model_choice],
@@ -373,4 +303,4 @@ with gr.Blocks() as demo:
         )
 
 demo.queue(default_concurrency_limit=200)
-demo.launch(show_api=False, ssr_mode=False)
+demo.launch(show_api=False)

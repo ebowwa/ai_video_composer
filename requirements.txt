@@ -1,3 +1,9 @@
 openai>=1.55.0
-gradio==5.9.1
-moviepy==1
+gradio>=4.44.0
+moviepy==1.0.3
+decorator==4.4.2
+imageio-ffmpeg>=0.4.8
+numpy>=1.22.0
+uvicorn>=0.27.0
+pillow>=10.0.0
+python-dotenv>=1.0.0
