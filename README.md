@@ -79,3 +79,4 @@ AI Video Composer is an intelligent media processing application that uses natur
 If you have ideas for improvements or bug fixes, please open a PR:
 
 [![Open a Pull Request](https://huggingface.co/datasets/huggingface/badges/raw/main/open-a-pr-lg-light.svg)](https://huggingface.co/spaces/huggingface-projects/video-composer-gpt4/discussions)
+# ai_video_composer
